@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Swimmer from "./Swimmer";
+
+const swimmer = new Swimmer();
+console.log("speed: ", swimmer.getSpeed());
+setInterval(() => console.log("position: ", swimmer.getPosition()), 1000);
 
 class App extends Component {
   render() {
