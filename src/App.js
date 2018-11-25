@@ -30,15 +30,25 @@ class App extends Component {
         this.state = {
             poolData: []
         };
-        const swimmer = new Swimmer();
-        // console.log("speed: ", swimmer.getSpeed());
+        const swimmer0 = new Swimmer();
+        const swimmer1 = new Swimmer();
+        const swimmer2 = new Swimmer();
+        const swimmer3 = new Swimmer();
         setInterval(() => {
-            // console.log("position: ", swimmer.getPosition());
             this.setState({
                 poolData: [{
-                    x: 0,
-                    y: swimmer.getPosition()
-                }, {x: 1, y: 0}]
+                    lane: 0,
+                    position: swimmer0.getPosition()
+                }, {
+                    lane: 1,
+                    position: swimmer1.getPosition()
+                }, {
+                    lane: 2,
+                    position: swimmer2.getPosition()
+                }, {
+                    lane: 3,
+                    position: swimmer3.getPosition()
+                }]
             });
         }, 1000);
     }

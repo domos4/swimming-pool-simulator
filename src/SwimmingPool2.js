@@ -17,11 +17,11 @@ export default class SwimmingPool2 extends React.PureComponent {
         height: PropTypes.number,
         data: PropTypes.arrayOf(
             PropTypes.shape({
-                x: PropTypes.number,
-                y: PropTypes.number,
+                lane: PropTypes.number,
+                position: PropTypes.number,
             })
         ),
-        poolLength: PropTypes.number
+        poolLength: PropTypes.number,
     };
 
     static defaultProps = {
@@ -33,7 +33,7 @@ export default class SwimmingPool2 extends React.PureComponent {
         return {
             data: props.data.map((e) => ({
                 ...e,
-                y: e.y * scaleFactor
+                position: e.position * scaleFactor
             }))
         };
     }
@@ -79,13 +79,12 @@ export default class SwimmingPool2 extends React.PureComponent {
     }
 
     drawPool() {
-        console.log(this.props.data, this.state.data);
         const {data} = this.state;
         const {width, height} = this.props;
         // x and y scales, I"ve used linear here but there are other options
         // the scales translate data values to pixel values for you
         const x = d3.scaleLinear()
-            .domain([0, this.getMaxBy("x")])  // the range of the values to plot
+            .domain([0, this.getMaxBy("lane")])  // the range of the values to plot
             .range([0, width]);        // the pixel range of the x-axis
 
         const y = d3.scaleLinear()
@@ -101,7 +100,6 @@ export default class SwimmingPool2 extends React.PureComponent {
 
         // the main object where the chart and axis will be drawn
         const main = chart.append("g")
-        // .attr("transform", `translate(${margin.left}, ${margin.top})`)
             .attr("width", width)
             .attr("height", height)
             .attr("class", "main");
@@ -112,8 +110,8 @@ export default class SwimmingPool2 extends React.PureComponent {
         g.selectAll("scatter-dots")
             .data(data)  // using the values in the ydata array
             .enter().append("svg:circle")  // create a new circle for each value
-            .attr("cy", (d) => y(d.y)) // translate y value to a pixel
-            .attr("cx", (d, idx) => x(data[idx].x)) // translate x value
+            .attr("cy", (d) => y(d.position)) // translate y value to a pixel
+            .attr("cx", (d, idx) => x(data[idx].lane)) // translate x value
             .attr("r", 10) // radius of circle
             .style("opacity", 0.6); // opacity of circle
     }
