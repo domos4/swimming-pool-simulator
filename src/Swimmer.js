@@ -5,7 +5,6 @@ export const METERS_PER_MILLISECOND = "mpms";
 export const METERS_PER_SECOND = "mps";
 
 const POOL_LENGTH = swimmingPool.length;
-const POSITION_CHANGE_INTERVAL = 1000; // in milliseconds
 
 const DIRECTION_GOING = 1;
 const DIRECTION_RETURNING = -1;
@@ -27,15 +26,17 @@ export default class Swimmer {
     speed; // in meters per millisecond
     position = 0;
     direction = DIRECTION_GOING;
+    positionChangeInterval; // in milliseconds
 
-    constructor() {
+    constructor({positionChangeInterval = 1000} = {}) {
         this.lane = _.random(1, swimmingPool.lanesCount);
         this.speed = _.random(20, 100) / (60 * 1000); // meters per minute divided by (60 * 1000)
-        setInterval(() => this.calculateNewPosition(), POSITION_CHANGE_INTERVAL)
+        this.positionChangeInterval = positionChangeInterval;
+        setInterval(() => this.calculateNewPosition(), this.positionChangeInterval)
     }
 
     calculateNewPosition() {
-        const positionChange = this.direction * (this.speed * POSITION_CHANGE_INTERVAL);
+        const positionChange = this.direction * (this.speed * this.positionChangeInterval);
         const maybeOutOfBoundsNewPosition = this.position + positionChange;
         if (maybeOutOfBoundsNewPosition < 0) {
             this.position = Math.abs(maybeOutOfBoundsNewPosition);

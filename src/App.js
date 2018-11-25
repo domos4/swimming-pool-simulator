@@ -19,6 +19,8 @@ const SwimmingPoolContainer = styled.div`
     justify-content: center;
 `;
 
+const REFRESH_RATE = 50;
+
 class App extends Component {
 
     state = {
@@ -30,10 +32,10 @@ class App extends Component {
         this.state = {
             poolData: []
         };
-        const swimmer0 = new Swimmer();
-        const swimmer1 = new Swimmer();
-        const swimmer2 = new Swimmer();
-        const swimmer3 = new Swimmer();
+        const swimmer0 = new Swimmer({positionChangeInterval: REFRESH_RATE});
+        const swimmer1 = new Swimmer({positionChangeInterval: REFRESH_RATE});
+        const swimmer2 = new Swimmer({positionChangeInterval: REFRESH_RATE});
+        const swimmer3 = new Swimmer({positionChangeInterval: REFRESH_RATE});
         setInterval(() => {
             this.setState({
                 poolData: [{
@@ -50,7 +52,7 @@ class App extends Component {
                     position: swimmer3.getPosition()
                 }]
             });
-        }, 1000);
+        }, REFRESH_RATE);
     }
 
     render() {
