@@ -3,15 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "d3-scale": "^2.1.2",
     "lodash": "^4.17.11",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "react-scripts": "1.1.5"
+    "react-scripts": "1.1.5",
+    "styled-components": "^4.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "d3": "^5.7.0"
   }
 }
