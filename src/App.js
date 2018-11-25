@@ -3,6 +3,7 @@ import './App.css';
 import Swimmer from "./Swimmer";
 import SwimmingPool2 from "./SwimmingPool2";
 import styled, {createGlobalStyle} from "styled-components";
+import swimmingPool from "./swimmingPool";
 
 const GlobalStyle = createGlobalStyle`
     body {
@@ -49,6 +50,7 @@ class App extends Component {
                 <SwimmingPoolContainer>
                     <SwimmingPool2
                         data={this.state.poolData}
+                        poolLength={swimmingPool.length}
                         width={document.documentElement.clientWidth - 2 * PADDING}
                         height={document.documentElement.clientHeight - 2 * PADDING}
                     />

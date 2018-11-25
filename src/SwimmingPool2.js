@@ -1,3 +1,4 @@
+import _ from "lodash";
 import * as d3 from "d3";
 import React from "react";
 import PropTypes from "prop-types";
@@ -19,10 +20,28 @@ export default class SwimmingPool2 extends React.PureComponent {
                 x: PropTypes.number,
                 y: PropTypes.number,
             })
-        )
+        ),
+        poolLength: PropTypes.number
     };
 
+    static defaultProps = {
+        data: []
+    };
+
+    static getDerivedStateFromProps(props) {
+        const scaleFactor = props.height / props.poolLength;
+        return {
+            data: props.data.map((e) => ({
+                ...e,
+                y: e.y * scaleFactor
+            }))
+        };
+    }
+
     ref = React.createRef();
+    state = {
+        data: []
+    };
 
     componentDidMount() {
         this.onUpdate();
@@ -54,13 +73,19 @@ export default class SwimmingPool2 extends React.PureComponent {
             .remove();
     }
 
-    drawPool() {
-        const {data, width, height} = this.props;
+    getMaxBy(key) {
+        const max = _.maxBy(this.state.data, (e) => e[key]);
+        return _.get(max, key, 0);
+    }
 
+    drawPool() {
+        console.log(this.props.data, this.state.data);
+        const {data} = this.state;
+        const {width, height} = this.props;
         // x and y scales, I"ve used linear here but there are other options
         // the scales translate data values to pixel values for you
         const x = d3.scaleLinear()
-            .domain([0, width])  // the range of the values to plot
+            .domain([0, this.getMaxBy("x")])  // the range of the values to plot
             .range([0, width]);        // the pixel range of the x-axis
 
         const y = d3.scaleLinear()
