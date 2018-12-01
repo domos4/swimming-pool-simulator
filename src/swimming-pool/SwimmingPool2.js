@@ -1,8 +1,9 @@
 import _ from "lodash";
 import * as d3 from "d3";
 import React from "react";
-import PropTypes from "prop-types";
 import styled from "styled-components";
+import * as PropTypes from "prop-types";
+import Swimmer from "../swimmer/Swimmer";
 
 const Container = styled.div`
     width: ${(props) => props.width}px;
@@ -15,40 +16,34 @@ export default class SwimmingPool2 extends React.PureComponent {
     static propTypes = {
         width: PropTypes.number,
         height: PropTypes.number,
-        data: PropTypes.arrayOf(
-            PropTypes.shape({
-                lane: PropTypes.number,
-                position: PropTypes.number,
-            })
+        swimmers: PropTypes.arrayOf(
+            PropTypes.instanceOf(Swimmer)
         ),
+        refreshRate: PropTypes.number,
         poolLength: PropTypes.number,
     };
 
     static defaultProps = {
-        data: []
+        swimmers: []
     };
-
-    static getDerivedStateFromProps(props) {
-        const scaleFactor = props.height / props.poolLength;
-        return {
-            data: props.data.map((e) => ({
-                ...e,
-                position: e.position * scaleFactor
-            }))
-        };
-    }
 
     ref = React.createRef();
     state = {
         data: []
     };
+    refreshIntervalId;
 
     componentDidMount() {
-        this.onUpdate();
+        this.updateData();
+        this.reDrawPool();
     }
 
-    componentDidUpdate() {
-        this.onUpdate();
+    componentDidUpdate(prevProps, prevState) {
+        if (!_.isEqual(prevProps.swimmers, this.props.swimmers) ||
+            !_.isEqual(prevProps.refreshRate, this.props.refreshRate)) {
+            this.updateData();
+        }
+        this.reDrawPool();
     }
 
     render() {
@@ -62,9 +57,22 @@ export default class SwimmingPool2 extends React.PureComponent {
         );
     }
 
-    onUpdate() {
+    reDrawPool() {
         this.clearAll();
         this.drawPool();
+    }
+
+    updateData() {
+        clearInterval(this.refreshIntervalId);
+        const scaleFactor = this.props.height / this.props.poolLength;
+        this.refreshIntervalId = setInterval(() => {
+            this.setState({
+                data: this.props.swimmers.map((swimmer) => ({
+                    lane: swimmer.getLane(),
+                    position: swimmer.getPosition() * scaleFactor
+                }))
+            });
+        }, this.props.refreshRate);
     }
 
     clearAll() {

@@ -28,8 +28,8 @@ export default class Swimmer {
     direction = DIRECTION_GOING;
     positionChangeInterval; // in milliseconds
 
-    constructor({positionChangeInterval = 1000} = {}) {
-        this.lane = _.random(1, swimmingPool.lanesCount);
+    constructor({positionChangeInterval = 1000, lane} = {}) {
+        this.lane = _.defaultTo(lane, _.random(1, swimmingPool.lanesCount));
         this.speed = _.random(20, 100) / (60 * 1000); // meters per minute divided by (60 * 1000)
         this.positionChangeInterval = positionChangeInterval;
         setInterval(() => this.calculateNewPosition(), this.positionChangeInterval)
