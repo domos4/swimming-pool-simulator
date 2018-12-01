@@ -1,5 +1,5 @@
 import _ from "lodash";
-import swimmingPool from "../swimming-pool/swimmingPool";
+import swimmingPool from "./SwimmingPool";
 
 export const METERS_PER_MILLISECOND = "mpms";
 export const METERS_PER_SECOND = "mps";

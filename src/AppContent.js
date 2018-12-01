@@ -1,8 +1,8 @@
 import _ from "lodash";
 import React from "react";
 import styled from "styled-components";
-import Swimmer from "./swimmer/Swimmer";
-import swimmingPool from "./swimming-pool/swimmingPool";
+import Swimmer from "./model/Swimmer";
+import swimmingPool from "./model/SwimmingPool";
 import SwimmingPool2 from "./swimming-pool/SwimmingPool2"; // TODO rename this windows workaround
 import SettingsPanel from "./settings-panel/SettingsPanel";
 

@@ -2,8 +2,8 @@ import _ from "lodash";
 import * as d3 from "d3";
 import React from "react";
 import styled from "styled-components";
+import Swimmer from "../model/Swimmer";
 import * as PropTypes from "prop-types";
-import Swimmer from "../swimmer/Swimmer";
 
 const Container = styled.div`
     width: ${(props) => props.width}px;
