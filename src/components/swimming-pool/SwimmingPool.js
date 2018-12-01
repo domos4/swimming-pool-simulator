@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import React from "react";
 import styled from "styled-components";
 import * as PropTypes from "prop-types";
-import SwimmingPoolModel from "../model/SwimmingPool";
+import SwimmingPoolModel from "../../model/SwimmingPool";
 
 const Container = styled.div`
     width: ${(props) => props.width}px;

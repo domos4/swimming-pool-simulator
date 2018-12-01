@@ -3,7 +3,7 @@ import styled from "styled-components";
 import * as PropTypes from "prop-types";
 import {Button} from "@blueprintjs/core";
 import {IconNames} from "@blueprintjs/icons";
-import SwimmingPool from "../model/SwimmingPool";
+import SwimmingPool from "../../model/SwimmingPool";
 
 const Container = styled.div`
     display: flex;

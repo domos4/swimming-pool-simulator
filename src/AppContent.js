@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import SwimmingPoolModel from "./model/SwimmingPool";
-import SwimmingPool from "./swimming-pool/SwimmingPool"; // TODO rename this windows workaround
-import SettingsPanel from "./settings-panel/SettingsPanel";
+import SwimmingPool from "./components/swimming-pool/SwimmingPool";
+import SettingsPanel from "./components/settings-panel/SettingsPanel";
 
 const PADDING = 50;
 const SwimmingPoolContainer = styled.div`
