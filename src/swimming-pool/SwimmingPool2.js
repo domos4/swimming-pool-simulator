@@ -81,9 +81,14 @@ export default class SwimmingPool2 extends React.PureComponent {
             .remove();
     }
 
-    getMaxBy(key) {
-        const max = _.maxBy(this.state.data, (e) => e[key]);
-        return _.get(max, key, 0);
+    getMaxLane() {
+        const max = _.maxBy(this.state.data, (e) => e.lane);
+        return _.get(max, "lane", 1);
+    }
+
+    getMinLane() {
+        const min = _.minBy(this.state.data, (e) => e.lane);
+        return _.get(min, "lane", 1);
     }
 
     drawPool() {
@@ -92,7 +97,7 @@ export default class SwimmingPool2 extends React.PureComponent {
         // x and y scales, I've used linear here but there are other options
         // the scales translate data values to pixel values for you
         const x = d3.scaleLinear()
-            .domain([0, this.getMaxBy("lane")])  // the range of the values to plot
+            .domain([this.getMinLane(), this.getMaxLane()])  // the range of the values to plot
             .range([0, width]);        // the pixel range of the x-axis
 
         const y = d3.scaleLinear()

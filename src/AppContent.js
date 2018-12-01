@@ -23,7 +23,7 @@ function createNewSwimmer(lane) {
 export default class AppContent extends React.PureComponent {
 
     state = {
-        swimmers: _.times(4, (idx) => createNewSwimmer(idx))
+        swimmers: _.times(4, (idx) => createNewSwimmer(idx + 1))
     };
 
     render() {

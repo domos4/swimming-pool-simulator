@@ -29,10 +29,20 @@ export default class Swimmer {
     positionChangeInterval; // in milliseconds
 
     constructor({positionChangeInterval = 1000, lane} = {}) {
-        this.lane = _.defaultTo(lane, _.random(1, swimmingPool.lanesCount));
+        this.setLane(lane);
         this.speed = _.random(20, 100) / (60 * 1000); // meters per minute divided by (60 * 1000)
         this.positionChangeInterval = positionChangeInterval;
         setInterval(() => this.calculateNewPosition(), this.positionChangeInterval)
+    }
+
+    setLane(lane = _.random(1, swimmingPool.lanesCount)) {
+        if (!_.isInteger(lane)) {
+            throw new Error(`lane=${lane} must be an integer.`);
+        }
+        if (lane > swimmingPool.lanesCount || lane < 1) {
+            throw new Error(`lane=${lane} must be in range [1, ${swimmingPool.lanesCount}]`);
+        }
+        this.lane = lane;
     }
 
     calculateNewPosition() {
