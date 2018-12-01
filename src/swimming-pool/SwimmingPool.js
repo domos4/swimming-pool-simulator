@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import React from "react";
 import styled from "styled-components";
 import * as PropTypes from "prop-types";
-import SwimmingPool from "../model/SwimmingPool";
+import SwimmingPoolModel from "../model/SwimmingPool";
 
 const Container = styled.div`
     width: ${(props) => props.width}px;
@@ -11,12 +11,12 @@ const Container = styled.div`
     border: 1px solid black;
 `;
 
-export default class SwimmingPool2 extends React.PureComponent {
+export default class SwimmingPool extends React.PureComponent {
 
     static propTypes = {
         width: PropTypes.number,
         height: PropTypes.number,
-        swimmingPool: PropTypes.instanceOf(SwimmingPool)
+        swimmingPool: PropTypes.instanceOf(SwimmingPoolModel)
     };
 
     static defaultProps = {
