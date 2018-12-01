@@ -19,10 +19,6 @@ export default class SwimmingPool extends React.PureComponent {
         swimmingPool: PropTypes.instanceOf(SwimmingPoolModel)
     };
 
-    static defaultProps = {
-        swimmers: []
-    };
-
     ref = React.createRef();
     state = {
         data: []
