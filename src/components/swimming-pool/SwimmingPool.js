@@ -90,14 +90,12 @@ export default class SwimmingPool extends React.PureComponent {
         const chart = d3.select(this.ref.current)
             .append("svg:svg")
             .attr("width", width)
-            .attr("height", height)
-            .attr("class", "chart");
+            .attr("height", height);
 
         // the main object where the chart and axis will be drawn
         const main = chart.append("g")
             .attr("width", width)
-            .attr("height", height)
-            .attr("class", "main");
+            .attr("height", height);
 
         // draw the graph object
         const g = main.append("svg:g");
