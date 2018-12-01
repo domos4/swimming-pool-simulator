@@ -2,8 +2,8 @@ import _ from "lodash";
 import * as d3 from "d3";
 import React from "react";
 import styled from "styled-components";
-import Swimmer from "../model/Swimmer";
 import * as PropTypes from "prop-types";
+import SwimmingPool from "../model/SwimmingPool";
 
 const Container = styled.div`
     width: ${(props) => props.width}px;
@@ -16,11 +16,7 @@ export default class SwimmingPool2 extends React.PureComponent {
     static propTypes = {
         width: PropTypes.number,
         height: PropTypes.number,
-        swimmers: PropTypes.arrayOf(
-            PropTypes.instanceOf(Swimmer)
-        ),
-        refreshRate: PropTypes.number,
-        poolLength: PropTypes.number,
+        swimmingPool: PropTypes.instanceOf(SwimmingPool)
     };
 
     static defaultProps = {
@@ -39,8 +35,8 @@ export default class SwimmingPool2 extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (!_.isEqual(prevProps.swimmers, this.props.swimmers) ||
-            !_.isEqual(prevProps.refreshRate, this.props.refreshRate)) {
+        if (!_.isEqual(prevProps.swimmingPool.getSwimmers(), this.props.swimmingPool.getSwimmers()) ||
+            !_.isEqual(prevProps.swimmingPool.getPositionChangeInterval(), this.props.swimmingPool.getPositionChangeInterval())) {
             this.updateData();
         }
         this.reDrawPool();
@@ -64,15 +60,15 @@ export default class SwimmingPool2 extends React.PureComponent {
 
     updateData() {
         clearInterval(this.refreshIntervalId);
-        const scaleFactor = this.props.height / this.props.poolLength;
+        const scaleFactor = this.props.height / this.props.swimmingPool.getLength();
         this.refreshIntervalId = setInterval(() => {
             this.setState({
-                data: this.props.swimmers.map((swimmer) => ({
+                data: this.props.swimmingPool.getSwimmers().map((swimmer) => ({
                     lane: swimmer.getLane(),
                     position: swimmer.getPosition() * scaleFactor
                 }))
             });
-        }, this.props.refreshRate);
+        }, this.props.swimmingPool.getPositionChangeInterval());
     }
 
     clearAll() {
@@ -81,23 +77,13 @@ export default class SwimmingPool2 extends React.PureComponent {
             .remove();
     }
 
-    getMaxLane() {
-        const max = _.maxBy(this.state.data, (e) => e.lane);
-        return _.get(max, "lane", 1);
-    }
-
-    getMinLane() {
-        const min = _.minBy(this.state.data, (e) => e.lane);
-        return _.get(min, "lane", 1);
-    }
-
     drawPool() {
         const {data} = this.state;
         const {width, height} = this.props;
         // x and y scales, I've used linear here but there are other options
         // the scales translate data values to pixel values for you
         const x = d3.scaleLinear()
-            .domain([this.getMinLane(), this.getMaxLane()])  // the range of the values to plot
+            .domain([1, this.props.swimmingPool.getLanesCount()])  // the range of the values to plot
             .range([0, width]);        // the pixel range of the x-axis
 
         const y = d3.scaleLinear()
