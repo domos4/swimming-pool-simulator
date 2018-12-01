@@ -8,7 +8,7 @@ import SwimmingPoolModel from "../../model/SwimmingPool";
 const Container = styled.div`
     width: ${(props) => props.width}px;
     height: ${(props) => props.height}px;
-    border: 1px solid black;
+    border: 2px solid black;
 `;
 
 export default class SwimmingPool extends React.PureComponent {
@@ -55,16 +55,17 @@ export default class SwimmingPool extends React.PureComponent {
     }
 
     updateData() {
+        const {height, swimmingPool} = this.props;
         clearInterval(this.refreshIntervalId);
-        const scaleFactor = this.props.height / this.props.swimmingPool.getLength();
+        const scaleFactor = height / swimmingPool.getLength();
         this.refreshIntervalId = setInterval(() => {
             this.setState({
-                data: this.props.swimmingPool.getSwimmers().map((swimmer) => ({
+                data: swimmingPool.getSwimmers().map((swimmer) => ({
                     lane: swimmer.getLane(),
                     position: swimmer.getPosition() * scaleFactor
                 }))
             });
-        }, this.props.swimmingPool.getPositionChangeInterval());
+        }, swimmingPool.getPositionChangeInterval());
     }
 
     clearAll() {
@@ -74,39 +75,52 @@ export default class SwimmingPool extends React.PureComponent {
     }
 
     drawPool() {
-        const {data} = this.state;
         const {width, height} = this.props;
-        // x and y scales, I've used linear here but there are other options
-        // the scales translate data values to pixel values for you
-        const x = d3.scaleLinear()
-            .domain([1, this.props.swimmingPool.getLanesCount()])  // the range of the values to plot
-            .range([0, width]);        // the pixel range of the x-axis
 
-        const y = d3.scaleLinear()
-            .domain([0, height])
-            .range([height, 0]);
-
-        // the chart object, includes all margins
         const chart = d3.select(this.ref.current)
             .append("svg:svg")
             .attr("width", width)
             .attr("height", height);
 
-        // the main object where the chart and axis will be drawn
-        const main = chart.append("g")
-            .attr("width", width)
-            .attr("height", height);
-
-        // draw the graph object
-        const g = main.append("svg:g");
-
-        g.selectAll("scatter-dots")
-            .data(data)  // using the values in the ydata array
-            .enter().append("svg:circle")  // create a new circle for each value
-            .attr("cy", (d) => y(d.position)) // translate y value to a pixel
-            .attr("cx", (d, idx) => x(data[idx].lane)) // translate x value
-            .attr("r", 10) // radius of circle
-            .style("opacity", 0.6); // opacity of circle
+        this.appendCircles(chart);
+        this.appendLines(chart);
     }
+
+    appendCircles = (graph) => {
+        const {data} = this.state;
+        const {width, height, swimmingPool} = this.props;
+        const x = d3.scaleLinear()
+            .domain([1, swimmingPool.getLanesCount()])
+            .range([0, width]);
+        const y = d3.scaleLinear()
+            .domain([0, height])
+            .range([height, 0]);
+
+        graph.selectAll()
+            .data(data)
+            .enter()
+            .append("svg:circle")
+            .attr("cy", (d) => y(d.position))
+            .attr("cx", (d, idx) => x(data[idx].lane))
+            .attr("r", 10)
+            .style("opacity", 0.6);
+    };
+
+    appendLines = (graph) => {
+        const {width, height, swimmingPool} = this.props;
+        const lanesCount = swimmingPool.getLanesCount();
+        const laneWidth = width / lanesCount;
+        const laneMarkers = _.times(lanesCount - 1).map((idx) => laneWidth * (idx + 1));
+        graph.selectAll()
+            .data(laneMarkers)
+            .enter()
+            .append("line")
+            .attr("x1", (d) => d)
+            .attr("y1", 0)
+            .attr("x2", (d) => d)
+            .attr("y2", height)
+            .attr("stroke-width", 2)
+            .attr("stroke", "black");
+    };
 
 }
