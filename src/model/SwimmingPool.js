@@ -30,7 +30,7 @@ export default class SwimmingPool {
     };
 
     addSwimmer = ({lane} = {}) => {
-        const {poolLength, lanesCount, positionChangeInterval} = this;
+        const {length: poolLength, lanesCount, positionChangeInterval} = this;
         this.swimmers.push(
             new Swimmer({lane, poolLength, lanesCount, positionChangeInterval})
         );
