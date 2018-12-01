@@ -81,7 +81,7 @@ export default class SwimmingPool2 extends React.PureComponent {
     drawPool() {
         const {data} = this.state;
         const {width, height} = this.props;
-        // x and y scales, I"ve used linear here but there are other options
+        // x and y scales, I've used linear here but there are other options
         // the scales translate data values to pixel values for you
         const x = d3.scaleLinear()
             .domain([0, this.getMaxBy("lane")])  // the range of the values to plot

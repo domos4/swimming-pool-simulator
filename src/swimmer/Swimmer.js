@@ -1,5 +1,5 @@
 import _ from "lodash";
-import swimmingPool from "./swimmingPool";
+import swimmingPool from "../swimming-pool/swimmingPool";
 
 export const METERS_PER_MILLISECOND = "mpms";
 export const METERS_PER_SECOND = "mps";
@@ -63,6 +63,8 @@ export default class Swimmer {
                 return this.speed;
             case METERS_PER_SECOND:
                 return this.speed * (60 * 1000);
+            default:
+                return this.speed;
         }
     }
 
