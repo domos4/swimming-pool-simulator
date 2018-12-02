@@ -49,6 +49,15 @@
     classnames "^2.2"
     tslib "^1.9.0"
 
+"@blueprintjs/select@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-3.3.0.tgz#e5ff961a846a9e90ca627b58912bda5058518941"
+  integrity sha512-veqsiLzUwXyKCgOJJrFHmthoaPzIyIzSlbPMz15p4f+Cc/ropHQOBqVlfoQiS7ASi4AnzI56tHwQ2PvzT56a2w==
+  dependencies:
+    "@blueprintjs/core" "^3.9.0"
+    classnames "^2.2"
+    tslib "^1.9.0"
+
 "@emotion/is-prop-valid@^0.6.8":
   version "0.6.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.6.8.tgz#68ad02831da41213a2089d2cab4e8ac8b30cbd85"
