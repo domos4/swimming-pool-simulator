@@ -3,8 +3,8 @@ import _ from "lodash";
 export const METERS_PER_MILLISECOND = "mpms";
 export const METERS_PER_SECOND = "mps";
 
-const DIRECTION_GOING = 1;
-const DIRECTION_RETURNING = -1;
+export const DIRECTION_GOING = 1;
+export const DIRECTION_RETURNING = -1;
 
 function getOppositeDirection(direction) {
     switch (direction) {
@@ -82,6 +82,10 @@ export default class Swimmer {
 
     getPosition = () => {
         return this.position;
+    };
+
+    getDirection = () => {
+        return this.direction;
     };
 
     getSpeed = (unit = METERS_PER_MILLISECOND) => {

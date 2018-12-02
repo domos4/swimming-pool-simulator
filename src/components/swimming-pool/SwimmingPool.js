@@ -4,6 +4,7 @@ import React from "react";
 import styled from "styled-components";
 import * as PropTypes from "prop-types";
 import SwimmingPoolModel from "../../model/SwimmingPool";
+import {DIRECTION_GOING, DIRECTION_RETURNING} from "../../model/Swimmer";
 
 const Container = styled.div`
     width: ${(props) => props.width}px;
@@ -61,11 +62,35 @@ export default class SwimmingPool extends React.PureComponent {
         this.refreshIntervalId = setInterval(() => {
             this.setState({
                 data: swimmingPool.getSwimmers().map((swimmer) => ({
-                    lane: swimmer.getLane(),
-                    position: swimmer.getPosition() * scaleFactor
+                    x: this.getSwimmerXPosition(swimmer),
+                    y: swimmer.getPosition() * scaleFactor
                 }))
             });
         }, swimmingPool.getPositionChangeInterval());
+    }
+
+    getLaneWidth() {
+        return this.props.width / this.props.swimmingPool.getLanesCount();
+    }
+
+    // lane starts indexing from 1
+    getLaneRightBoundXPosition(lane) {
+        return (this.getLaneWidth() * lane);
+    }
+
+    // lane starts indexing from 1
+    getSwimmerXPosition(swimmer) {
+        const direction = swimmer.getDirection();
+        const laneWidth = this.getLaneWidth();
+        const lanePosition = this.getLaneRightBoundXPosition(swimmer.getLane());
+        switch (direction) {
+            case DIRECTION_GOING:
+                return lanePosition - (laneWidth / 3);
+            case DIRECTION_RETURNING:
+                return lanePosition - (laneWidth * 2 / 3);
+            default:
+                throw new Error(`direction=${direction} must be one of [${DIRECTION_GOING}, ${DIRECTION_RETURNING}]`);
+        }
     }
 
     clearAll() {
@@ -88,9 +113,9 @@ export default class SwimmingPool extends React.PureComponent {
 
     appendCircles = (graph) => {
         const {data} = this.state;
-        const {width, height, swimmingPool} = this.props;
+        const {width, height} = this.props;
         const x = d3.scaleLinear()
-            .domain([1, swimmingPool.getLanesCount()])
+            .domain([0, width])
             .range([0, width]);
         const y = d3.scaleLinear()
             .domain([0, height])
@@ -100,17 +125,15 @@ export default class SwimmingPool extends React.PureComponent {
             .data(data)
             .enter()
             .append("svg:circle")
-            .attr("cy", (d) => y(d.position))
-            .attr("cx", (d, idx) => x(data[idx].lane))
+            .attr("cy", (d) => y(d.y))
+            .attr("cx", (d, idx) => x(data[idx].x))
             .attr("r", 10)
             .style("opacity", 0.6);
     };
 
     appendLines = (graph) => {
-        const {width, height, swimmingPool} = this.props;
-        const lanesCount = swimmingPool.getLanesCount();
-        const laneWidth = width / lanesCount;
-        const laneMarkers = _.times(lanesCount - 1).map((idx) => laneWidth * (idx + 1));
+        const laneMarkers = _.times(this.props.swimmingPool.getLanesCount() - 1)
+            .map((idx) => this.getLaneRightBoundXPosition(idx + 1));
         graph.selectAll()
             .data(laneMarkers)
             .enter()
@@ -118,7 +141,7 @@ export default class SwimmingPool extends React.PureComponent {
             .attr("x1", (d) => d)
             .attr("y1", 0)
             .attr("x2", (d) => d)
-            .attr("y2", height)
+            .attr("y2", this.props.height)
             .attr("stroke-width", 2)
             .attr("stroke", "black");
     };
