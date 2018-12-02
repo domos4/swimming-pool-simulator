@@ -85,9 +85,9 @@ export default class SwimmingPool extends React.PureComponent {
         const lanePosition = this.getLaneRightBoundXPosition(swimmer.getLane());
         switch (direction) {
             case DIRECTION_GOING:
-                return lanePosition - (laneWidth / 3);
+                return lanePosition - (laneWidth / 4);
             case DIRECTION_RETURNING:
-                return lanePosition - (laneWidth * 2 / 3);
+                return lanePosition - (laneWidth * 3 / 4);
             default:
                 throw new Error(`direction=${direction} must be one of [${DIRECTION_GOING}, ${DIRECTION_RETURNING}]`);
         }
