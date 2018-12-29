@@ -6,10 +6,11 @@ import * as PropTypes from "prop-types";
 import SwimmingPoolModel from "../../model/SwimmingPool";
 import {DIRECTION_GOING, DIRECTION_RETURNING} from "../../model/Swimmer";
 
+const BORDER_WIDTH = 2;
 const Container = styled.div`
     width: ${(props) => props.width}px;
     height: ${(props) => props.height}px;
-    border: 2px solid black;
+    border: ${BORDER_WIDTH}px solid black;
 `;
 
 export default class SwimmingPool extends React.PureComponent {
@@ -56,7 +57,8 @@ export default class SwimmingPool extends React.PureComponent {
     }
 
     updateData() {
-        const {height, swimmingPool} = this.props;
+        const {swimmingPool} = this.props;
+        const height = this.calculateHeight();
         clearInterval(this.refreshIntervalId);
         const scaleFactor = height / swimmingPool.getLength();
         this.refreshIntervalId = setInterval(() => {
@@ -67,6 +69,10 @@ export default class SwimmingPool extends React.PureComponent {
                 }))
             });
         }, swimmingPool.getPositionChangeInterval());
+    }
+
+    calculateHeight() {
+        return this.props.height - (2 * BORDER_WIDTH);
     }
 
     getLaneWidth() {
@@ -100,12 +106,10 @@ export default class SwimmingPool extends React.PureComponent {
     }
 
     drawPool() {
-        const {width, height} = this.props;
-
         const chart = d3.select(this.ref.current)
             .append("svg:svg")
-            .attr("width", width)
-            .attr("height", height);
+            .attr("width", this.props.width)
+            .attr("height", this.calculateHeight());
 
         this.appendCircles(chart);
         this.appendLines(chart);
@@ -113,7 +117,8 @@ export default class SwimmingPool extends React.PureComponent {
 
     appendCircles = (graph) => {
         const {data} = this.state;
-        const {width, height} = this.props;
+        const {width} = this.props;
+        const height = this.calculateHeight();
         const x = d3.scaleLinear()
             .domain([0, width])
             .range([0, width]);
@@ -141,7 +146,7 @@ export default class SwimmingPool extends React.PureComponent {
             .attr("x1", (d) => d)
             .attr("y1", 0)
             .attr("x2", (d) => d)
-            .attr("y2", this.props.height)
+            .attr("y2", this.calculateHeight())
             .attr("stroke-width", 2)
             .attr("stroke", "black");
     };

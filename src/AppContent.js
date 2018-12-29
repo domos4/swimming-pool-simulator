@@ -3,6 +3,7 @@ import styled from "styled-components";
 import SwimmingPoolModel from "./model/SwimmingPool";
 import SwimmingPool from "./components/swimming-pool/SwimmingPool";
 import SettingsPanel from "./components/settings-panel/SettingsPanel";
+import {HEIGHT} from "./components/settings-panel/SettingsPanel";
 
 const PADDING = 50;
 const SwimmingPoolContainer = styled.div`
@@ -25,7 +26,7 @@ export default class AppContent extends React.PureComponent {
                 <SwimmingPool
                     swimmingPool={this.state.swimmingPool}
                     width={document.documentElement.clientWidth - 2 * PADDING}
-                    height={document.documentElement.clientHeight - 2 * PADDING}
+                    height={document.documentElement.clientHeight - 2 * PADDING - HEIGHT}
                 />
             </SwimmingPoolContainer>
         );
