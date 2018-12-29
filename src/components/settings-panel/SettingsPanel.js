@@ -28,8 +28,9 @@ export default class SettingsPanel extends React.PureComponent {
     };
 
     renderButtons() {
-        return ADD_SWIMMERS_BUTTONS_OPTIONS.map((howManySwimmers) => (
+        return ADD_SWIMMERS_BUTTONS_OPTIONS.map((howManySwimmers, idx) => (
             <StyledButton
+                key={idx}
                 icon={IconNames.ADD}
                 onClick={() => this.addSwimmers(howManySwimmers)}>
                 add {howManySwimmers} swimmers
