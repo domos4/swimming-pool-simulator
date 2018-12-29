@@ -19,6 +19,7 @@ const ADD_SWIMMERS_BUTTONS_OPTIONS = [1, 5, 10, 20, 50];
 export default class SettingsPanel extends React.PureComponent {
 
     static propTypes = {
+        className: PropTypes.string,
         swimmingPool: PropTypes.instanceOf(SwimmingPool)
     };
 
@@ -38,7 +39,7 @@ export default class SettingsPanel extends React.PureComponent {
 
     render() {
         return (
-            <Container>
+            <Container className={this.props.className}>
                 {this.renderButtons()}
             </Container>
         );
