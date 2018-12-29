@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import SwimmingPoolModel from "./model/SwimmingPool";
-import SwimmingPool from "./components/swimming-pool/SwimmingPool";
+import SwimmingPool from "./components/swimming-pool/SwimmingPoolContainer";
 import SettingsPanel from "./components/settings-panel/SettingsPanel";
 import {HEIGHT} from "./components/settings-panel/SettingsPanel";
 

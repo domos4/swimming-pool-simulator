@@ -10,7 +10,10 @@
     "lodash": "^4.17.11",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "react-redux": "^6.0.0",
     "react-scripts": "1.1.5",
+    "redux": "^4.0.1",
+    "redux-devtools-extension": "^2.13.7",
     "styled-components": "^4.1.1"
   },
   "scripts": {
