@@ -16,7 +16,6 @@ const StyledButton = styled(Button)`
 `;
 const ADD_SWIMMERS_BUTTONS_OPTIONS = [1, 5, 10, 20, 50];
 
-
 export default class SettingsPanel extends React.PureComponent {
 
     static propTypes = {
