@@ -1,4 +1,4 @@
-import { random, isInteger, isFinite } from "lodash";
+import { isFinite, isInteger, random } from "lodash";
 
 export const METERS_PER_MILLISECOND = "mpms";
 export const METERS_PER_SECOND = "mps";
@@ -6,21 +6,18 @@ export const METERS_PER_SECOND = "mps";
 export const DIRECTION_GOING = 1;
 export const DIRECTION_RETURNING = -1;
 
-function getOppositeDirection(direction) {
+type Direction = typeof DIRECTION_GOING | typeof DIRECTION_RETURNING;
+
+function getOppositeDirection(direction: Direction) {
   switch (direction) {
     case DIRECTION_GOING:
       return DIRECTION_RETURNING;
     case DIRECTION_RETURNING:
       return DIRECTION_GOING;
-    default:
-      throw new Error(
-        `direction=${direction} must be one of [${DIRECTION_GOING}, ${DIRECTION_RETURNING}]`
-      );
   }
 }
 
 interface Props {
-  lane: number;
   lanesCount: number;
   poolLength: number;
   positionChangeInterval: number;
@@ -32,19 +29,19 @@ export default class Swimmer {
   poolLength;
 
   // swimmer info
-  lane;
+  lane = 1;
   speed; // in meters per millisecond
   position = 0;
-  direction = DIRECTION_GOING;
+  direction: Direction = DIRECTION_GOING;
 
-  positionChangeInterval; // in milliseconds
+  positionChangeInterval = 100; // in milliseconds
 
-  constructor({ lane, lanesCount, poolLength, positionChangeInterval }: Props) {
+  constructor({ lanesCount, poolLength, positionChangeInterval }: Props) {
     this.poolLength = poolLength;
     this.lanesCount = lanesCount;
-    this.setLane(lane);
+    this.setLane();
     this.setPositionChangeInterval(positionChangeInterval);
-    this.speed = _.random(20, 100) / (60 * 1000); // meters per minute divided by (60 * 1000)
+    this.speed = random(20, 100) / (60 * 1000); // meters per minute divided by (60 * 1000)
     setInterval(this.calculateNewPosition, this.positionChangeInterval);
   }
 
@@ -58,7 +55,7 @@ export default class Swimmer {
     this.lane = lane;
   };
 
-  setPositionChangeInterval = (interval) => {
+  setPositionChangeInterval = (interval: number) => {
     if (!isFinite(interval) || interval <= 0) {
       throw new Error(
         `positionChangeInterval=${interval} must be finite, positive number.`

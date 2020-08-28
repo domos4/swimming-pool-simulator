@@ -4,7 +4,7 @@ export default class SwimmingPool {
   length;
   lanesCount;
   positionChangeInterval;
-  swimmers = [];
+  swimmers: Array<Swimmer> = [];
 
   constructor({
     length = 50,
@@ -28,10 +28,10 @@ export default class SwimmingPool {
     return this.positionChangeInterval;
   };
 
-  addSwimmer = (lane: number) => {
+  addSwimmer = () => {
     const { length: poolLength, lanesCount, positionChangeInterval } = this;
     this.swimmers.push(
-      new Swimmer({ lane, poolLength, lanesCount, positionChangeInterval })
+      new Swimmer({ poolLength, lanesCount, positionChangeInterval })
     );
   };
 

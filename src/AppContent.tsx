@@ -18,8 +18,12 @@ const StyledSettingsPanel = styled(SettingsPanel)`
   padding-bottom: ${SETTINGS_PANEL_PADDING}px;
 `;
 
-export default class AppContent extends PureComponent {
-  state = {
+interface State {
+  swimmingPool: SwimmingPoolModel;
+}
+
+export default class AppContent extends PureComponent<{}, State> {
+  state: State = {
     swimmingPool: new SwimmingPoolModel(),
   };
 

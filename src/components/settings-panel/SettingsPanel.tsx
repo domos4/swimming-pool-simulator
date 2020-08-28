@@ -1,8 +1,6 @@
-import React from "react";
+import React, { PureComponent } from "react";
 import { times } from "lodash";
-import { PureComponent } from "react";
 import styled from "styled-components";
-import * as PropTypes from "prop-types";
 import { Button } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import SwimmingPool from "../../model/SwimmingPool";
@@ -16,13 +14,13 @@ const StyledButton = styled(Button)`
 `;
 const ADD_SWIMMERS_BUTTONS_OPTIONS = [1, 5, 10, 20, 50];
 
-export default class SettingsPanel extends PureComponent {
-  static propTypes = {
-    className: PropTypes.string,
-    swimmingPool: PropTypes.instanceOf(SwimmingPool),
-  };
+interface Props {
+  className?: string;
+  swimmingPool: SwimmingPool;
+}
 
-  addSwimmers = (howManySwimmers) => {
+export default class SettingsPanel extends PureComponent<Props> {
+  addSwimmers = (howManySwimmers: number) => {
     times(howManySwimmers, this.props.swimmingPool.addSwimmer);
   };
 

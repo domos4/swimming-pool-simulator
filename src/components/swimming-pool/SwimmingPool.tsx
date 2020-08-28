@@ -1,38 +1,54 @@
-import React from "react";
-import { isEqual } from "lodash";
+import React, { createRef, PureComponent, RefObject } from "react";
+import { isEqual, times } from "lodash";
 import * as d3 from "d3";
 import styled from "styled-components";
-import * as PropTypes from "prop-types";
 import SwimmingPoolModel from "../../model/SwimmingPool";
-import { DIRECTION_GOING, DIRECTION_RETURNING } from "../../model/Swimmer";
-import { createRef, PureComponent } from "react";
+import Swimmer, {
+  DIRECTION_GOING,
+  DIRECTION_RETURNING,
+} from "../../model/Swimmer";
 
 const BORDER_WIDTH = 2;
-const Container = styled.div`
+const Container = styled.div<{
+  width: number;
+  height: number;
+  ref: RefObject<HTMLDivElement>;
+}>`
   width: ${(props) => props.width}px;
   height: ${(props) => props.height}px;
   border: ${BORDER_WIDTH}px solid black;
 `;
 
-export default class SwimmingPool extends PureComponent {
-  static propTypes = {
-    width: PropTypes.number,
-    height: PropTypes.number,
-    swimmingPool: PropTypes.instanceOf(SwimmingPoolModel),
-  };
+interface Props {
+  width: number;
+  height: number;
+  swimmingPool: SwimmingPoolModel;
+}
 
-  ref = createRef();
-  state = {
+interface DataPoint {
+  x: number;
+  y: number;
+}
+
+interface State {
+  data: Array<DataPoint>;
+}
+
+type Graph = d3.Selection<HTMLDivElement | null, DataPoint, null, undefined>;
+
+export default class SwimmingPool extends PureComponent<Props, State> {
+  ref = createRef<HTMLDivElement>();
+  state: State = {
     data: [],
   };
-  refreshIntervalId;
+  refreshIntervalId = 0;
 
   componentDidMount() {
     this.updateData();
     this.reDrawPool();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
     if (
       !isEqual(
         prevProps.swimmingPool.getSwimmers(),
@@ -82,12 +98,12 @@ export default class SwimmingPool extends PureComponent {
   }
 
   // lane starts indexing from 1
-  getLaneRightBoundXPosition(lane) {
+  getLaneRightBoundXPosition(lane: number) {
     return this.getLaneWidth() * lane;
   }
 
   // lane starts indexing from 1
-  getSwimmerXPosition(swimmer) {
+  getSwimmerXPosition(swimmer: Swimmer) {
     const direction = swimmer.getDirection();
     const laneWidth = this.getLaneWidth();
     const lanePosition = this.getLaneRightBoundXPosition(swimmer.getLane());
@@ -108,17 +124,17 @@ export default class SwimmingPool extends PureComponent {
   }
 
   drawPool() {
-    const chart = d3
+    const graph = d3
       .select(this.ref.current)
       .append("svg:svg")
       .attr("width", this.props.width)
       .attr("height", this.calculateHeight());
 
-    this.appendCircles(chart);
-    this.appendLines(chart);
+    this.appendCircles(graph as Graph);
+    this.appendLines(graph as Graph);
   }
 
-  appendCircles = (graph) => {
+  appendCircles = (graph: Graph) => {
     const { data } = this.state;
     const { width } = this.props;
     const height = this.calculateHeight();
@@ -130,14 +146,14 @@ export default class SwimmingPool extends PureComponent {
       .data(data)
       .enter()
       .append("svg:circle")
-      .attr("cy", (d) => y(d.y))
-      .attr("cx", (d, idx) => x(data[idx].x))
+      .attr("cy", (d: DataPoint) => y(d.y))
+      .attr("cx", (d: DataPoint, idx: number) => x(data[idx].x))
       .attr("r", 10)
       .style("opacity", 0.6);
   };
 
-  appendLines = (graph) => {
-    const laneMarkers = _.times(
+  appendLines = (graph: Graph) => {
+    const laneMarkers = times(
       this.props.swimmingPool.getLanesCount() - 1
     ).map((idx) => this.getLaneRightBoundXPosition(idx + 1));
     graph
