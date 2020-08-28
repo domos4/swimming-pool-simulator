@@ -14,13 +14,12 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export default class App extends React.Component {
-
-    render() {
-        return (
-            <React.Fragment>
-                <GlobalStyle/>
-                <AppContent/>
-            </React.Fragment>
-        );
-    }
+  render() {
+    return (
+      <React.Fragment>
+        <GlobalStyle />
+        <AppContent />
+      </React.Fragment>
+    );
+  }
 }
