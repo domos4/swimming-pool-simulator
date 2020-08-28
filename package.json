@@ -6,15 +6,15 @@
     "@blueprintjs/core": "^3.9.0",
     "@blueprintjs/icons": "^3.3.0",
     "@blueprintjs/select": "^3.3.0",
-    "d3-scale": "^2.1.2",
+    "d3-scale": "^3.2.2",
     "lodash": "^4.17.11",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "react-redux": "^6.0.0",
-    "react-scripts": "1.1.5",
+    "react-redux": "^7.2.1",
+    "react-scripts": "3.4.3",
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.7",
-    "styled-components": "^4.1.1"
+    "styled-components": "^5.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -23,6 +23,6 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "d3": "^5.7.0"
+    "d3": "^6.0.0"
   }
 }
