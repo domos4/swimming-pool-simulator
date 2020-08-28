@@ -5,7 +5,6 @@
   "dependencies": {
     "@blueprintjs/core": "^3.9.0",
     "@blueprintjs/icons": "^3.3.0",
-    "@blueprintjs/select": "^3.3.0",
     "d3": "^6.0.0",
     "d3-scale": "^3.2.2",
     "lodash": "^4.17.11",
