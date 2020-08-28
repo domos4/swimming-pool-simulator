@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { random, isInteger, isFinite } from "lodash";
 
 export const METERS_PER_MILLISECOND = "mpms";
 export const METERS_PER_SECOND = "mps";
@@ -15,6 +15,13 @@ function getOppositeDirection(direction) {
         default:
             throw new Error(`direction=${direction} must be one of [${DIRECTION_GOING}, ${DIRECTION_RETURNING}]`);
     }
+}
+
+interface Props {
+    lane: number;
+    lanesCount: number;
+    poolLength: number;
+    positionChangeInterval: number;
 }
 
 export default class Swimmer {
@@ -36,7 +43,7 @@ export default class Swimmer {
                     lanesCount,
                     poolLength,
                     positionChangeInterval
-                } = {}) {
+                }: Props) {
         this.poolLength = poolLength;
         this.lanesCount = lanesCount;
         this.setLane(lane);
@@ -45,8 +52,8 @@ export default class Swimmer {
         setInterval(this.calculateNewPosition, this.positionChangeInterval)
     }
 
-    setLane = (lane = _.random(1, this.lanesCount)) => {
-        if (!_.isInteger(lane)) {
+    setLane = (lane = random(1, this.lanesCount)) => {
+        if (!isInteger(lane)) {
             throw new Error(`lane=${lane} must be an integer.`);
         }
         if (lane > this.lanesCount || lane < 1) {
@@ -56,7 +63,7 @@ export default class Swimmer {
     };
 
     setPositionChangeInterval = (interval) => {
-        if (!_.isFinite(interval) || interval <= 0) {
+        if (!isFinite(interval) || interval <= 0) {
             throw new Error(`positionChangeInterval=${interval} must be finite, positive number.`);
         }
         this.positionChangeInterval = interval;

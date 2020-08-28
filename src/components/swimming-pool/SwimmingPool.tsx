@@ -1,10 +1,11 @@
-import _ from "lodash";
-import * as d3 from "d3";
 import React from "react";
+import { isEqual } from "lodash";
+import * as d3 from "d3";
 import styled from "styled-components";
 import * as PropTypes from "prop-types";
 import SwimmingPoolModel from "../../model/SwimmingPool";
 import {DIRECTION_GOING, DIRECTION_RETURNING} from "../../model/Swimmer";
+import { createRef, PureComponent } from 'react';
 
 const BORDER_WIDTH = 2;
 const Container = styled.div`
@@ -13,7 +14,7 @@ const Container = styled.div`
     border: ${BORDER_WIDTH}px solid black;
 `;
 
-export default class SwimmingPool extends React.PureComponent {
+export default class SwimmingPool extends PureComponent {
 
     static propTypes = {
         width: PropTypes.number,
@@ -21,7 +22,7 @@ export default class SwimmingPool extends React.PureComponent {
         swimmingPool: PropTypes.instanceOf(SwimmingPoolModel)
     };
 
-    ref = React.createRef();
+    ref = createRef();
     state = {
         data: []
     };
@@ -33,8 +34,8 @@ export default class SwimmingPool extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (!_.isEqual(prevProps.swimmingPool.getSwimmers(), this.props.swimmingPool.getSwimmers()) ||
-            !_.isEqual(prevProps.swimmingPool.getPositionChangeInterval(), this.props.swimmingPool.getPositionChangeInterval())) {
+        if (!isEqual(prevProps.swimmingPool.getSwimmers(), this.props.swimmingPool.getSwimmers()) ||
+            !isEqual(prevProps.swimmingPool.getPositionChangeInterval(), this.props.swimmingPool.getPositionChangeInterval())) {
             this.updateData();
         }
         this.reDrawPool();

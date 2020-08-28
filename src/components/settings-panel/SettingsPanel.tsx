@@ -1,13 +1,13 @@
-import _ from "lodash";
 import React from "react";
+import { times } from "lodash";
+import { PureComponent } from "react";
 import styled from "styled-components";
 import * as PropTypes from "prop-types";
-import {Button} from "@blueprintjs/core";
-import {IconNames} from "@blueprintjs/icons";
+import { Button } from "@blueprintjs/core";
+import { IconNames } from "@blueprintjs/icons";
 import SwimmingPool from "../../model/SwimmingPool";
 
-export const HEIGHT = 30
-;
+export const HEIGHT = 30;
 const Container = styled.div`
     display: flex;
 `;
@@ -16,7 +16,7 @@ const StyledButton = styled(Button)`
 `;
 const ADD_SWIMMERS_BUTTONS_OPTIONS = [1, 5, 10, 20, 50];
 
-export default class SettingsPanel extends React.PureComponent {
+export default class SettingsPanel extends PureComponent {
 
     static propTypes = {
         className: PropTypes.string,
@@ -24,7 +24,7 @@ export default class SettingsPanel extends React.PureComponent {
     };
 
     addSwimmers = (howManySwimmers) => {
-        _.times(howManySwimmers, this.props.swimmingPool.addSwimmer);
+        times(howManySwimmers, this.props.swimmingPool.addSwimmer);
     };
 
     renderButtons() {

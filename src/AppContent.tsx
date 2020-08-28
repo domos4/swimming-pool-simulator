@@ -4,6 +4,7 @@ import SwimmingPoolModel from "./model/SwimmingPool";
 import SwimmingPool from "./components/swimming-pool/SwimmingPool";
 import SettingsPanel from "./components/settings-panel/SettingsPanel";
 import {HEIGHT} from "./components/settings-panel/SettingsPanel";
+import { PureComponent } from 'react';
 
 const PADDING = 50;
 const Container = styled.div`
@@ -17,7 +18,7 @@ const StyledSettingsPanel = styled(SettingsPanel)`
     padding-bottom: ${SETTINGS_PANEL_PADDING}px;
 `;
 
-export default class AppContent extends React.PureComponent {
+export default class AppContent extends PureComponent {
 
     state = {
         swimmingPool: new SwimmingPoolModel()
