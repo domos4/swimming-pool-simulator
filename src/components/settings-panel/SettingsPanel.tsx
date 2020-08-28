@@ -11,6 +11,9 @@ const Container = styled.div`
 `;
 const StyledButton = styled(Button)`
   height: ${HEIGHT}px;
+  :not(:last-child) {
+    margin-right: 16px;
+  }
 `;
 const ADD_SWIMMERS_BUTTONS_OPTIONS = [1, 5, 10, 20, 50];
 
