@@ -1,4 +1,5 @@
 import Swimmer from "./Swimmer";
+import { random } from "lodash";
 
 export interface SwimmingPoolModel {
   getLength: () => number;
@@ -16,8 +17,13 @@ export default function makeSwimmingPool({
   const swimmers: Array<Swimmer> = [];
 
   function addSwimmer(): void {
+    const randomLaneIndex = random(1, lanesCount);
     swimmers.push(
-      new Swimmer({ poolLength: length, lanesCount, positionChangeInterval })
+      new Swimmer({
+        laneLength: length,
+        laneIndex: randomLaneIndex,
+        positionChangeInterval,
+      })
     );
   }
 

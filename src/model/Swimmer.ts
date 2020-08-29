@@ -1,4 +1,4 @@
-import { isFinite, isInteger, random } from "lodash";
+import { isFinite, random } from "lodash";
 
 export const METERS_PER_MILLISECOND = "mpms";
 export const METERS_PER_SECOND = "mps";
@@ -18,42 +18,30 @@ function getOppositeDirection(direction: Direction) {
 }
 
 interface Props {
-  lanesCount: number;
-  poolLength: number;
+  laneIndex: number;
+  laneLength: number;
   positionChangeInterval: number;
 }
 
 export default class Swimmer {
-  // pool info
-  lanesCount;
-  poolLength;
+  // lane info
+  laneIndex: number;
+  laneLength: number;
 
   // swimmer info
-  lane = 1;
   speed; // in meters per millisecond
   position = 0;
   direction: Direction = DIRECTION_GOING;
 
   positionChangeInterval = 100; // in milliseconds
 
-  constructor({ lanesCount, poolLength, positionChangeInterval }: Props) {
-    this.poolLength = poolLength;
-    this.lanesCount = lanesCount;
-    this.setLane();
+  constructor({ laneIndex, laneLength, positionChangeInterval }: Props) {
+    this.laneIndex = laneIndex;
+    this.laneLength = laneLength;
     this.setPositionChangeInterval(positionChangeInterval);
     this.speed = random(20, 100) / (60 * 1000); // meters per minute divided by (60 * 1000)
     setInterval(this.calculateNewPosition, this.positionChangeInterval);
   }
-
-  setLane = (lane = random(1, this.lanesCount)) => {
-    if (!isInteger(lane)) {
-      throw new Error(`lane=${lane} must be an integer.`);
-    }
-    if (lane > this.lanesCount || lane < 1) {
-      throw new Error(`lane=${lane} must be in range [1, ${this.lanesCount}]`);
-    }
-    this.lane = lane;
-  };
 
   setPositionChangeInterval = (interval: number) => {
     if (!isFinite(interval) || interval <= 0) {
@@ -71,8 +59,8 @@ export default class Swimmer {
     if (maybeOutOfBoundsNewPosition < 0) {
       this.position = Math.abs(maybeOutOfBoundsNewPosition);
       this.direction = getOppositeDirection(this.direction);
-    } else if (maybeOutOfBoundsNewPosition > this.poolLength) {
-      this.position = 2 * this.poolLength - (this.position + positionChange);
+    } else if (maybeOutOfBoundsNewPosition > this.laneLength) {
+      this.position = 2 * this.laneLength - (this.position + positionChange);
       this.direction = getOppositeDirection(this.direction);
     } else {
       this.position = maybeOutOfBoundsNewPosition;
@@ -80,7 +68,7 @@ export default class Swimmer {
   };
 
   getLane = () => {
-    return this.lane;
+    return this.laneIndex;
   };
 
   getPosition = () => {
