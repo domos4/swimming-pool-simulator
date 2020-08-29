@@ -27,17 +27,18 @@ const Container = styled.div<{
 
 const Lane = styled.div<{
   width: number;
-  height: number;
   withBorder: boolean;
 }>`
+  height: 100%;
   width: ${(props) => props.width}px;
-  height: ${(props) => props.height}px;
   ${(props) => (props.withBorder ? `border-right: ${border};` : undefined)}
 `;
 
 const GraphMountingElement = styled.div`
-  top: 0;
   position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
 `;
 
 interface Props {
@@ -60,7 +61,7 @@ type Graph = d3.Selection<
 
 export default function SwimmingPool({
   width,
-  height: heightFromProps,
+  height,
   swimmingPool,
 }: Props): ReactElement {
   const graphMountingElementRef = useRef<HTMLDivElement>(null);
@@ -69,7 +70,6 @@ export default function SwimmingPool({
     Array<SwimmerPosition>
   >([]);
 
-  const height = heightFromProps - 2 * borderWidth;
   const laneWidth = width / swimmingPool.getLanesCount();
 
   // lane starts indexing from 1
@@ -167,7 +167,6 @@ export default function SwimmingPool({
       {times(swimmingPool.getLanesCount(), (index) => (
         <Lane
           key={index}
-          height={height}
           width={laneWidth}
           withBorder={index !== swimmingPool.getLanesCount() - 1}
         />
