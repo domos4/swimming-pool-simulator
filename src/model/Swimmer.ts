@@ -1,7 +1,4 @@
-import { isFinite, random } from "lodash";
-
-export const METERS_PER_MILLISECOND = "mpms";
-export const METERS_PER_SECOND = "mps";
+import { random } from "lodash";
 
 export const DIRECTION_GOING = 1;
 export const DIRECTION_RETURNING = -1;
@@ -18,75 +15,46 @@ function getOppositeDirection(direction: Direction) {
 }
 
 interface Props {
-  laneIndex: number;
-  laneLength: number;
-  positionChangeInterval: number;
+  laneIndex: number; // indexing from 1
+  laneLength: number; // in meters
+  refreshRate: number; // in milliseconds
+  speed?: number; // meters per millisecond
 }
 
-export default class Swimmer {
-  // lane info
-  laneIndex: number;
-  laneLength: number;
+export interface SwimmerModel {
+  getLane: () => number;
+  getPosition: () => number;
+  getDirection: () => Direction;
+}
 
-  // swimmer info
-  speed; // in meters per millisecond
-  position = 0;
-  direction: Direction = DIRECTION_GOING;
+export default function makeSwimmer({
+  laneIndex,
+  laneLength,
+  refreshRate,
+  speed = random(20, 100) / (60 * 1000),
+}: Props): SwimmerModel {
+  let position = 0;
+  let direction: Direction = DIRECTION_GOING;
 
-  positionChangeInterval = 100; // in milliseconds
-
-  constructor({ laneIndex, laneLength, positionChangeInterval }: Props) {
-    this.laneIndex = laneIndex;
-    this.laneLength = laneLength;
-    this.setPositionChangeInterval(positionChangeInterval);
-    this.speed = random(20, 100) / (60 * 1000); // meters per minute divided by (60 * 1000)
-    setInterval(this.calculateNewPosition, this.positionChangeInterval);
+  function calculateNewPosition(): void {
+    const positionChange = direction * (speed * refreshRate);
+    const maybeOutOfBoundsNewPosition = position + positionChange;
+    if (maybeOutOfBoundsNewPosition < 0) {
+      position = Math.abs(maybeOutOfBoundsNewPosition);
+      direction = getOppositeDirection(direction);
+    } else if (maybeOutOfBoundsNewPosition > laneLength) {
+      position = 2 * laneLength - (position + positionChange);
+      direction = getOppositeDirection(direction);
+    } else {
+      position = maybeOutOfBoundsNewPosition;
+    }
   }
 
-  setPositionChangeInterval = (interval: number) => {
-    if (!isFinite(interval) || interval <= 0) {
-      throw new Error(
-        `positionChangeInterval=${interval} must be finite, positive number.`
-      );
-    }
-    this.positionChangeInterval = interval;
-  };
+  setInterval(calculateNewPosition, refreshRate);
 
-  calculateNewPosition = () => {
-    const positionChange =
-      this.direction * (this.speed * this.positionChangeInterval);
-    const maybeOutOfBoundsNewPosition = this.position + positionChange;
-    if (maybeOutOfBoundsNewPosition < 0) {
-      this.position = Math.abs(maybeOutOfBoundsNewPosition);
-      this.direction = getOppositeDirection(this.direction);
-    } else if (maybeOutOfBoundsNewPosition > this.laneLength) {
-      this.position = 2 * this.laneLength - (this.position + positionChange);
-      this.direction = getOppositeDirection(this.direction);
-    } else {
-      this.position = maybeOutOfBoundsNewPosition;
-    }
-  };
-
-  getLane = () => {
-    return this.laneIndex;
-  };
-
-  getPosition = () => {
-    return this.position;
-  };
-
-  getDirection = () => {
-    return this.direction;
-  };
-
-  getSpeed = (unit = METERS_PER_MILLISECOND) => {
-    switch (unit) {
-      case METERS_PER_MILLISECOND:
-        return this.speed;
-      case METERS_PER_SECOND:
-        return this.speed * (60 * 1000);
-      default:
-        return this.speed;
-    }
+  return {
+    getLane: () => laneIndex,
+    getPosition: () => position,
+    getDirection: () => direction,
   };
 }

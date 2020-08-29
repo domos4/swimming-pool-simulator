@@ -1,36 +1,41 @@
-import Swimmer from "./Swimmer";
+import makeSwimmer, { SwimmerModel } from "./Swimmer";
 import { random } from "lodash";
+
+interface Props {
+  length?: number; // in meters
+  lanesCount?: number;
+  refreshRate?: number; // in milliseconds
+}
 
 export interface SwimmingPoolModel {
   getLength: () => number;
   getLanesCount: () => number;
-  getPositionChangeInterval: () => number;
+  getRefreshRate: () => number;
   addSwimmer: () => void;
-  getSwimmers: () => Array<Swimmer>;
+  getSwimmers: () => Array<SwimmerModel>;
 }
 
 export default function makeSwimmingPool({
   length = 50,
   lanesCount = 10,
-  positionChangeInterval = 50,
-} = {}): SwimmingPoolModel {
-  const swimmers: Array<Swimmer> = [];
+  refreshRate = 50,
+}: Props = {}): SwimmingPoolModel {
+  const swimmers: Array<SwimmerModel> = [];
 
   function addSwimmer(): void {
     const randomLaneIndex = random(1, lanesCount);
-    swimmers.push(
-      new Swimmer({
-        laneLength: length,
-        laneIndex: randomLaneIndex,
-        positionChangeInterval,
-      })
-    );
+    const swimmer = makeSwimmer({
+      laneLength: length,
+      laneIndex: randomLaneIndex,
+      refreshRate,
+    });
+    swimmers.push(swimmer);
   }
 
   return {
     getLength: () => length,
     getLanesCount: () => lanesCount,
-    getPositionChangeInterval: () => positionChangeInterval,
+    getRefreshRate: () => refreshRate,
     addSwimmer,
     getSwimmers: () => swimmers,
   };

@@ -10,9 +10,10 @@ import { times } from "lodash";
 import * as d3 from "d3";
 import styled from "styled-components";
 import { SwimmingPoolModel } from "../../model/SwimmingPool";
-import Swimmer, {
+import {
   DIRECTION_GOING,
   DIRECTION_RETURNING,
+  SwimmerModel,
 } from "../../model/Swimmer";
 
 const BORDER_WIDTH = 2;
@@ -60,7 +61,7 @@ export default function SwimmingPool({
 
   // lane starts indexing from 1
   const getSwimmerXPosition = useCallback(
-    (swimmer: Swimmer) => {
+    (swimmer: SwimmerModel) => {
       const direction = swimmer.getDirection();
       const lanePosition = getLaneRightBoundXPosition(swimmer.getLane());
       switch (direction) {
@@ -86,7 +87,7 @@ export default function SwimmingPool({
           y: swimmer.getPosition() * scaleFactor,
         }))
       );
-    }, swimmingPool.getPositionChangeInterval());
+    }, swimmingPool.getRefreshRate());
   }, [getSwimmerXPosition, height, swimmingPool]);
 
   const appendCircles = useCallback(
