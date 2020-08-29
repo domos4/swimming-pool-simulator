@@ -11,13 +11,15 @@ import styled from "styled-components";
 import { SwimmingPoolModel } from "../../model/SwimmingPool";
 import { SwimmerModel } from "../../model/Swimmer";
 
+interface BaseProps {
+  width: number;
+  height: number;
+}
+
 const borderWidth = 2;
 const border = `${borderWidth}px solid black`;
 
-const Container = styled.div<{
-  width: number;
-  height: number;
-}>`
+const Container = styled.div<BaseProps>`
   display: flex;
   position: relative;
   border: ${border};
@@ -41,9 +43,7 @@ const GraphMountingElement = styled.div`
   height: 100%;
 `;
 
-interface Props {
-  width: number;
-  height: number;
+interface Props extends BaseProps {
   swimmingPool: SwimmingPoolModel;
 }
 
