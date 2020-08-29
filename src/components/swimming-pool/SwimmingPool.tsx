@@ -1,5 +1,12 @@
-import React, { createRef, PureComponent, RefObject } from "react";
-import { isEqual, times } from "lodash";
+import React, {
+  ReactElement,
+  RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { times } from "lodash";
 import * as d3 from "d3";
 import styled from "styled-components";
 import SwimmingPoolModel from "../../model/SwimmingPool";
@@ -30,142 +37,119 @@ interface DataPoint {
   y: number;
 }
 
-interface State {
-  data: Array<DataPoint>;
-}
-
 type Graph = d3.Selection<HTMLDivElement | null, DataPoint, null, undefined>;
 
-export default class SwimmingPool extends PureComponent<Props, State> {
-  ref = createRef<HTMLDivElement>();
-  state: State = {
-    data: [],
-  };
-  refreshIntervalId = 0;
+export default function SwimmingPool({
+  width,
+  height: heightFromProps,
+  swimmingPool,
+}: Props): ReactElement {
+  const ref = useRef<HTMLDivElement>(null);
+  const [data, setData] = useState<Array<DataPoint>>([]);
 
-  componentDidMount() {
-    this.updateData();
-    this.reDrawPool();
-  }
+  const height = heightFromProps - 2 * BORDER_WIDTH;
+  const laneWidth = width / swimmingPool.getLanesCount();
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
-    if (
-      !isEqual(
-        prevProps.swimmingPool.getSwimmers(),
-        this.props.swimmingPool.getSwimmers()
-      ) ||
-      !isEqual(
-        prevProps.swimmingPool.getPositionChangeInterval(),
-        this.props.swimmingPool.getPositionChangeInterval()
-      )
-    ) {
-      this.updateData();
-    }
-    this.reDrawPool();
-  }
+  // lane starts indexing from 1
+  const getLaneRightBoundXPosition = useCallback(
+    (lane: number) => {
+      return laneWidth * lane;
+    },
+    [laneWidth]
+  );
 
-  render() {
-    const { width, height } = this.props;
-    return <Container width={width} height={height} ref={this.ref} />;
-  }
+  // lane starts indexing from 1
+  const getSwimmerXPosition = useCallback(
+    (swimmer: Swimmer) => {
+      const direction = swimmer.getDirection();
+      const lanePosition = getLaneRightBoundXPosition(swimmer.getLane());
+      switch (direction) {
+        case DIRECTION_GOING:
+          return lanePosition - laneWidth / 4;
+        case DIRECTION_RETURNING:
+          return lanePosition - (laneWidth * 3) / 4;
+        default:
+          throw new Error(
+            `direction=${direction} must be one of [${DIRECTION_GOING}, ${DIRECTION_RETURNING}]`
+          );
+      }
+    },
+    [getLaneRightBoundXPosition, laneWidth]
+  );
 
-  reDrawPool() {
-    this.clearAll();
-    this.drawPool();
-  }
-
-  updateData() {
-    const { swimmingPool } = this.props;
-    const height = this.calculateHeight();
-    clearInterval(this.refreshIntervalId);
+  const updateData = useCallback(() => {
     const scaleFactor = height / swimmingPool.getLength();
-    this.refreshIntervalId = setInterval(() => {
-      this.setState({
-        data: swimmingPool.getSwimmers().map((swimmer) => ({
-          x: this.getSwimmerXPosition(swimmer),
+    setInterval(() => {
+      setData(
+        swimmingPool.getSwimmers().map((swimmer) => ({
+          x: getSwimmerXPosition(swimmer),
           y: swimmer.getPosition() * scaleFactor,
-        })),
-      });
+        }))
+      );
     }, swimmingPool.getPositionChangeInterval());
-  }
+  }, [getSwimmerXPosition, height, swimmingPool]);
 
-  calculateHeight() {
-    return this.props.height - 2 * BORDER_WIDTH;
-  }
+  const appendCircles = useCallback(
+    (graph: Graph) => {
+      const x = d3.scaleLinear().domain([0, width]).range([0, width]);
+      const y = d3.scaleLinear().domain([0, height]).range([height, 0]);
 
-  getLaneWidth() {
-    return this.props.width / this.props.swimmingPool.getLanesCount();
-  }
+      graph
+        .selectAll()
+        .data(data)
+        .enter()
+        .append("svg:circle")
+        .attr("cy", (d: DataPoint) => y(d.y))
+        .attr("cx", (d: DataPoint, idx: number) => x(data[idx].x))
+        .attr("r", 10)
+        .style("opacity", 0.6);
+    },
+    [data, height, width]
+  );
 
-  // lane starts indexing from 1
-  getLaneRightBoundXPosition(lane: number) {
-    return this.getLaneWidth() * lane;
-  }
+  const appendLines = useCallback(
+    (graph: Graph) => {
+      const laneMarkers = times(swimmingPool.getLanesCount() - 1).map((idx) =>
+        getLaneRightBoundXPosition(idx + 1)
+      );
+      graph
+        .selectAll()
+        .data(laneMarkers)
+        .enter()
+        .append("line")
+        .attr("x1", (d) => d)
+        .attr("y1", 0)
+        .attr("x2", (d) => d)
+        .attr("y2", height)
+        .attr("stroke-width", 2)
+        .attr("stroke", "black");
+    },
+    [getLaneRightBoundXPosition, height, swimmingPool]
+  );
 
-  // lane starts indexing from 1
-  getSwimmerXPosition(swimmer: Swimmer) {
-    const direction = swimmer.getDirection();
-    const laneWidth = this.getLaneWidth();
-    const lanePosition = this.getLaneRightBoundXPosition(swimmer.getLane());
-    switch (direction) {
-      case DIRECTION_GOING:
-        return lanePosition - laneWidth / 4;
-      case DIRECTION_RETURNING:
-        return lanePosition - (laneWidth * 3) / 4;
-      default:
-        throw new Error(
-          `direction=${direction} must be one of [${DIRECTION_GOING}, ${DIRECTION_RETURNING}]`
-        );
-    }
-  }
-
-  clearAll() {
-    d3.select(this.ref.current).selectAll("*").remove();
-  }
-
-  drawPool() {
+  const drawPool = useCallback(() => {
     const graph = d3
-      .select(this.ref.current)
+      .select(ref.current)
       .append("svg:svg")
-      .attr("width", this.props.width)
-      .attr("height", this.calculateHeight());
+      .attr("width", width)
+      .attr("height", height);
 
-    this.appendCircles(graph as Graph);
-    this.appendLines(graph as Graph);
-  }
+    appendCircles(graph as Graph);
+    appendLines(graph as Graph);
+  }, [appendCircles, appendLines, height, width]);
 
-  appendCircles = (graph: Graph) => {
-    const { data } = this.state;
-    const { width } = this.props;
-    const height = this.calculateHeight();
-    const x = d3.scaleLinear().domain([0, width]).range([0, width]);
-    const y = d3.scaleLinear().domain([0, height]).range([height, 0]);
+  const clearAll = useCallback(() => {
+    d3.select(ref.current).selectAll("*").remove();
+  }, []);
 
-    graph
-      .selectAll()
-      .data(data)
-      .enter()
-      .append("svg:circle")
-      .attr("cy", (d: DataPoint) => y(d.y))
-      .attr("cx", (d: DataPoint, idx: number) => x(data[idx].x))
-      .attr("r", 10)
-      .style("opacity", 0.6);
-  };
+  useEffect(() => {
+    updateData();
+  }, [updateData]);
 
-  appendLines = (graph: Graph) => {
-    const laneMarkers = times(
-      this.props.swimmingPool.getLanesCount() - 1
-    ).map((idx) => this.getLaneRightBoundXPosition(idx + 1));
-    graph
-      .selectAll()
-      .data(laneMarkers)
-      .enter()
-      .append("line")
-      .attr("x1", (d) => d)
-      .attr("y1", 0)
-      .attr("x2", (d) => d)
-      .attr("y2", this.calculateHeight())
-      .attr("stroke-width", 2)
-      .attr("stroke", "black");
-  };
+  useEffect(() => {
+    clearAll();
+    drawPool();
+  }, [clearAll, drawPool]);
+
+  return <Container width={width} height={height} ref={ref} />;
 }
