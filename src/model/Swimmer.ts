@@ -1,17 +1,17 @@
 import { random } from "lodash";
 
-export const DIRECTION_GOING = 1;
-export const DIRECTION_RETURNING = -1;
+const directions = {
+  going: 1,
+  returning: -1,
+} as const;
 
-type Direction = typeof DIRECTION_GOING | typeof DIRECTION_RETURNING;
+type Direction = keyof typeof directions;
 
-function getOppositeDirection(direction: Direction) {
-  switch (direction) {
-    case DIRECTION_GOING:
-      return DIRECTION_RETURNING;
-    case DIRECTION_RETURNING:
-      return DIRECTION_GOING;
+function getOppositeDirection(direction: Direction): Direction {
+  if (direction === "going") {
+    return "returning";
   }
+  return "going";
 }
 
 interface Props {
@@ -34,10 +34,10 @@ export default function makeSwimmer({
   speed = random(20, 100) / (60 * 1000),
 }: Props): SwimmerModel {
   let position = 0;
-  let direction: Direction = DIRECTION_GOING;
+  let direction: Direction = "going";
 
   function calculateNewPosition(): void {
-    const positionChange = direction * (speed * refreshRate);
+    const positionChange = directions[direction] * (speed * refreshRate);
     const maybeOutOfBoundsNewPosition = position + positionChange;
     if (maybeOutOfBoundsNewPosition < 0) {
       position = Math.abs(maybeOutOfBoundsNewPosition);

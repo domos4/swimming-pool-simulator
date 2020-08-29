@@ -10,11 +10,7 @@ import { times } from "lodash";
 import * as d3 from "d3";
 import styled from "styled-components";
 import { SwimmingPoolModel } from "../../model/SwimmingPool";
-import {
-  DIRECTION_GOING,
-  DIRECTION_RETURNING,
-  SwimmerModel,
-} from "../../model/Swimmer";
+import { SwimmerModel } from "../../model/Swimmer";
 
 const BORDER_WIDTH = 2;
 const Container = styled.div<{
@@ -66,14 +62,10 @@ export default function SwimmingPool({
       const direction = swimmer.getDirection();
       const lanePosition = getLaneRightBoundXPosition(swimmer.getLane());
       switch (direction) {
-        case DIRECTION_GOING:
+        case "going":
           return lanePosition - laneWidth / 4;
-        case DIRECTION_RETURNING:
+        case "returning":
           return lanePosition - (laneWidth * 3) / 4;
-        default:
-          throw new Error(
-            `direction=${direction} must be one of [${DIRECTION_GOING}, ${DIRECTION_RETURNING}]`
-          );
       }
     },
     [getLaneRightBoundXPosition, laneWidth]
