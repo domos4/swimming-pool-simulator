@@ -9,7 +9,7 @@ import React, {
 import { times } from "lodash";
 import * as d3 from "d3";
 import styled from "styled-components";
-import SwimmingPoolModel from "../../model/SwimmingPool";
+import { SwimmingPoolModel } from "../../model/SwimmingPool";
 import Swimmer, {
   DIRECTION_GOING,
   DIRECTION_RETURNING,

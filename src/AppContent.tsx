@@ -1,6 +1,6 @@
 import React, { ReactElement, useMemo } from "react";
 import styled from "styled-components";
-import SwimmingPoolModel from "./model/SwimmingPool";
+import makeSwimmingPool from "./model/SwimmingPool";
 import SwimmingPool from "./components/swimming-pool/SwimmingPool";
 import SettingsPanel, {
   HEIGHT,
@@ -19,7 +19,7 @@ const StyledSettingsPanel = styled(SettingsPanel)`
 `;
 
 export default function AppContent(): ReactElement {
-  const swimmingPool = useMemo(() => new SwimmingPoolModel(), []);
+  const swimmingPool = useMemo(makeSwimmingPool, []);
 
   return (
     <Container>

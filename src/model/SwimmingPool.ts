@@ -1,41 +1,31 @@
 import Swimmer from "./Swimmer";
 
-export default class SwimmingPool {
-  length;
-  lanesCount;
-  positionChangeInterval;
-  swimmers: Array<Swimmer> = [];
+export interface SwimmingPoolModel {
+  getLength: () => number;
+  getLanesCount: () => number;
+  getPositionChangeInterval: () => number;
+  addSwimmer: () => void;
+  getSwimmers: () => Array<Swimmer>;
+}
 
-  constructor({
-    length = 50,
-    lanesCount = 10,
-    positionChangeInterval = 50,
-  } = {}) {
-    this.length = length;
-    this.lanesCount = lanesCount;
-    this.positionChangeInterval = positionChangeInterval;
+export default function makeSwimmingPool({
+  length = 50,
+  lanesCount = 10,
+  positionChangeInterval = 50,
+} = {}): SwimmingPoolModel {
+  const swimmers: Array<Swimmer> = [];
+
+  function addSwimmer(): void {
+    swimmers.push(
+      new Swimmer({ poolLength: length, lanesCount, positionChangeInterval })
+    );
   }
 
-  getLength = () => {
-    return this.length;
-  };
-
-  getLanesCount = () => {
-    return this.lanesCount;
-  };
-
-  getPositionChangeInterval = () => {
-    return this.positionChangeInterval;
-  };
-
-  addSwimmer = () => {
-    const { length: poolLength, lanesCount, positionChangeInterval } = this;
-    this.swimmers.push(
-      new Swimmer({ poolLength, lanesCount, positionChangeInterval })
-    );
-  };
-
-  getSwimmers = () => {
-    return this.swimmers;
+  return {
+    getLength: () => length,
+    getLanesCount: () => lanesCount,
+    getPositionChangeInterval: () => positionChangeInterval,
+    addSwimmer,
+    getSwimmers: () => swimmers,
   };
 }

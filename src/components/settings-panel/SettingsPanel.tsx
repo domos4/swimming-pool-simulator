@@ -3,7 +3,7 @@ import { times } from "lodash";
 import styled from "styled-components";
 import { Button } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
-import SwimmingPool from "../../model/SwimmingPool";
+import { SwimmingPoolModel } from "../../model/SwimmingPool";
 
 export const HEIGHT = 30;
 const Container = styled.div`
@@ -19,7 +19,7 @@ const ADD_SWIMMERS_BUTTONS_OPTIONS = [1, 5, 10, 20, 50];
 
 interface Props {
   className?: string;
-  swimmingPool: SwimmingPool;
+  swimmingPool: SwimmingPoolModel;
 }
 
 export default function SettingsPanel({
