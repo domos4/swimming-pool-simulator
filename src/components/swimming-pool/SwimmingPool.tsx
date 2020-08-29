@@ -70,6 +70,7 @@ export default function SwimmingPool({
     Array<SwimmerPosition>
   >([]);
 
+  const contentHeight = height - 2 * borderWidth;
   const laneWidth = width / swimmingPool.getLanesCount();
 
   // lane starts indexing from 1
@@ -99,7 +100,7 @@ export default function SwimmingPool({
     if (refreshIntervalId.current !== undefined) {
       clearInterval(refreshIntervalId.current);
     }
-    const scaleFactor = height / swimmingPool.getLength();
+    const scaleFactor = contentHeight / swimmingPool.getLength();
     refreshIntervalId.current = setInterval(() => {
       setSwimmerPositions(
         swimmingPool.getSwimmers().map((swimmer) => ({
@@ -108,7 +109,7 @@ export default function SwimmingPool({
         }))
       );
     }, swimmingPool.getRefreshRate());
-  }, [getSwimmerXPosition, height, refreshIntervalId, swimmingPool]);
+  }, [contentHeight, getSwimmerXPosition, swimmingPool]);
 
   const appendCircles = useCallback(
     (graph: Graph) => {
@@ -118,8 +119,8 @@ export default function SwimmingPool({
         .range([0, width]);
       const yScaleLinear = d3
         .scaleLinear()
-        .domain([0, height])
-        .range([height, 0]);
+        .domain([0, contentHeight])
+        .range([contentHeight, 0]);
 
       graph
         .selectAll()
@@ -135,7 +136,7 @@ export default function SwimmingPool({
         .attr("r", 10)
         .style("opacity", 0.6);
     },
-    [swimmerPositions, height, width]
+    [width, contentHeight, swimmerPositions]
   );
 
   const drawPool = useCallback(() => {
@@ -143,10 +144,10 @@ export default function SwimmingPool({
       .select(graphMountingElementRef.current)
       .append("svg:svg")
       .attr("width", width)
-      .attr("height", height);
+      .attr("height", contentHeight);
 
     appendCircles(graph as Graph);
-  }, [appendCircles, height, width]);
+  }, [appendCircles, contentHeight, width]);
 
   const clearAll = useCallback(() => {
     d3.select(graphMountingElementRef.current).selectAll("*").remove();
