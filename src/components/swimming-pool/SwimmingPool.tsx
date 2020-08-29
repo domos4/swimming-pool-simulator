@@ -1,16 +1,6 @@
-import React, {
-  Fragment,
-  ReactElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { times } from "lodash";
-import * as d3 from "d3";
+import React, { Fragment, ReactElement, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SwimmingPoolModel } from "../../model/SwimmingPool";
-import { SwimmerModel } from "../../model/Swimmer";
 import Lane from "./Lane";
 
 interface BaseProps {
@@ -33,142 +23,41 @@ const LaneDivider = styled.div`
   border-right: ${border};
 `;
 
-const GraphMountingElement = styled.div`
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 100%;
-`;
-
 interface Props extends BaseProps {
   swimmingPool: SwimmingPoolModel;
 }
 
-interface SwimmerPosition {
-  x: number;
-  y: number;
+function useForceUpdate(): () => void {
+  const [unusedCounter, setCounter] = useState(0);
+  return () => setCounter((counter) => counter + 1);
 }
-
-type Graph = d3.Selection<
-  HTMLDivElement | null,
-  SwimmerPosition,
-  null,
-  undefined
->;
 
 export default function SwimmingPool({
   width,
   height,
   swimmingPool,
 }: Props): ReactElement {
-  const graphMountingElementRef = useRef<HTMLDivElement>(null);
-  const refreshIntervalId = useRef<number | undefined>(undefined);
-  const [swimmerPositions, setSwimmerPositions] = useState<
-    Array<SwimmerPosition>
-  >([]);
-
   const contentHeight = height - 2 * borderWidth;
   const laneWidth = width / swimmingPool.getLanesCount();
 
-  // lane starts indexing from 1
-  const getLaneRightBoundXPosition = useCallback(
-    (lane: number) => {
-      return laneWidth * lane;
-    },
-    [laneWidth]
-  );
-
-  // lane starts indexing from 1
-  const getSwimmerXPosition = useCallback(
-    (swimmer: SwimmerModel) => {
-      const direction = swimmer.getDirection();
-      const lanePosition = getLaneRightBoundXPosition(swimmer.getLane());
-      switch (direction) {
-        case "going":
-          return lanePosition - laneWidth / 4;
-        case "returning":
-          return lanePosition - (laneWidth * 3) / 4;
-      }
-    },
-    [getLaneRightBoundXPosition, laneWidth]
-  );
-
-  const updateData = useCallback(() => {
-    if (refreshIntervalId.current !== undefined) {
-      clearInterval(refreshIntervalId.current);
-    }
-    const scaleFactor = contentHeight / swimmingPool.getLength();
-    refreshIntervalId.current = setInterval(() => {
-      setSwimmerPositions(
-        Object.values(swimmingPool.getLanes())
-          .map((lane) =>
-            lane.getSwimmers().map((swimmer) => ({
-              x: getSwimmerXPosition(swimmer),
-              y: swimmer.getPosition() * scaleFactor,
-            }))
-          )
-          .flat()
-      );
-    }, swimmingPool.getRefreshRate()); // refresh the interface with the same refresh rate as the model
-  }, [contentHeight, getSwimmerXPosition, swimmingPool]);
-
-  const appendCircles = useCallback(
-    (graph: Graph) => {
-      const xScaleLinear = d3
-        .scaleLinear()
-        .domain([0, width])
-        .range([0, width]);
-      const yScaleLinear = d3
-        .scaleLinear()
-        .domain([0, contentHeight])
-        .range([contentHeight, 0]);
-
-      graph
-        .selectAll()
-        .data(swimmerPositions)
-        .enter()
-        .append("svg:circle")
-        .attr("cy", (swimmerPosition: SwimmerPosition) =>
-          yScaleLinear(swimmerPosition.y)
-        )
-        .attr("cx", (swimmerPosition: SwimmerPosition, index) =>
-          xScaleLinear(swimmerPositions[index].x)
-        )
-        .attr("r", 10)
-        .style("opacity", 0.6);
-    },
-    [width, contentHeight, swimmerPositions]
-  );
-
-  const drawPool = useCallback(() => {
-    const graph = d3
-      .select(graphMountingElementRef.current)
-      .append("svg:svg")
-      .attr("width", width)
-      .attr("height", contentHeight);
-
-    appendCircles(graph as Graph);
-  }, [appendCircles, contentHeight, width]);
-
-  const clearAll = useCallback(() => {
-    d3.select(graphMountingElementRef.current).selectAll("*").remove();
-  }, []);
-
+  // TODO update component on model update instead of this hack
+  const forceUpdate = useForceUpdate();
   useEffect(() => {
-    updateData();
-  }, [updateData]);
-
-  useEffect(() => {
-    clearAll();
-    drawPool();
-  }, [clearAll, drawPool]);
+    setTimeout(() => {
+      forceUpdate();
+    }, 100);
+  }, [forceUpdate]);
 
   return (
     <Container width={width} height={height}>
-      <GraphMountingElement ref={graphMountingElementRef} />
-      {times(swimmingPool.getLanesCount(), (index) => (
+      {swimmingPool.getLanes().map((lane, index) => (
         <Fragment key={index}>
-          <Lane width={laneWidth - borderWidth} />
+          <Lane
+            model={lane}
+            width={laneWidth - borderWidth}
+            height={contentHeight}
+            scaleFactor={contentHeight / swimmingPool.getLength()}
+          />
           {index !== swimmingPool.getLanesCount() - 1 && <LaneDivider />}
         </Fragment>
       ))}

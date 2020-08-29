@@ -16,7 +16,7 @@ export interface SwimmingPoolModel {
   getLanesCount: () => number;
   getRefreshRate: () => number;
   addRandomSwimmer: () => SwimmerModel;
-  getLanes: () => LanesMap;
+  getLanes: () => Array<LaneModel>;
 }
 
 export default function makeSwimmingPool({
@@ -24,18 +24,19 @@ export default function makeSwimmingPool({
   lanesCount,
   refreshRate,
 }: Props): SwimmingPoolModel {
-  const lanes: LanesMap = times(lanesCount, (index) =>
+  const lanes: Array<LaneModel> = times(lanesCount, (index) =>
     makeLane({ index: index + 1, length, refreshRate })
-  ).reduce((accumulator, lane) => {
+  );
+  const lanesMap: LanesMap = lanes.reduce((accumulatedLanesMap, lane) => {
     return {
-      ...accumulator,
+      ...accumulatedLanesMap,
       [lane.getIndex()]: lane,
     };
   }, {});
 
   function addRandomSwimmer(): SwimmerModel {
     const randomLaneIndex = random(1, lanesCount);
-    return lanes[randomLaneIndex].addSwimmer();
+    return lanesMap[randomLaneIndex].addSwimmer();
   }
 
   return {

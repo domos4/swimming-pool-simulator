@@ -5,7 +5,7 @@ const directions = {
   returning: -1,
 } as const;
 
-type Direction = keyof typeof directions;
+export type Direction = keyof typeof directions;
 
 function getOppositeDirection(direction: Direction): Direction {
   if (direction === "going") {
@@ -25,6 +25,7 @@ export interface SwimmerModel {
   getLane: () => number;
   getPosition: () => number;
   getDirection: () => Direction;
+  getRefreshRate: () => number;
 }
 
 export default function makeSwimmer({
@@ -56,5 +57,6 @@ export default function makeSwimmer({
     getLane: () => laneIndex,
     getPosition: () => position,
     getDirection: () => direction,
+    getRefreshRate: () => refreshRate,
   };
 }
