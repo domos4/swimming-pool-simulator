@@ -1,6 +1,5 @@
 import React, {
   ReactElement,
-  RefObject,
   useCallback,
   useEffect,
   useRef,
@@ -13,14 +12,32 @@ import { SwimmingPoolModel } from "../../model/SwimmingPool";
 import { SwimmerModel } from "../../model/Swimmer";
 
 const borderWidth = 2;
+const border = `${borderWidth}px solid black`;
+
 const Container = styled.div<{
   width: number;
   height: number;
-  ref: RefObject<HTMLDivElement>;
+}>`
+  display: flex;
+  position: relative;
+  border: ${border};
+  width: ${(props) => props.width}px;
+  height: ${(props) => props.height}px;
+`;
+
+const Lane = styled.div<{
+  width: number;
+  height: number;
+  withBorder: boolean;
 }>`
   width: ${(props) => props.width}px;
   height: ${(props) => props.height}px;
-  border: ${borderWidth}px solid black;
+  ${(props) => (props.withBorder ? `border-right: ${border};` : undefined)}
+`;
+
+const GraphMountingElement = styled.div`
+  top: 0;
+  position: absolute;
 `;
 
 interface Props {
@@ -46,7 +63,7 @@ export default function SwimmingPool({
   height: heightFromProps,
   swimmingPool,
 }: Props): ReactElement {
-  const ref = useRef<HTMLDivElement>(null);
+  const graphMountingElementRef = useRef<HTMLDivElement>(null);
   const refreshIntervalId = useRef<number | undefined>(undefined);
   const [swimmerPositions, setSwimmerPositions] = useState<
     Array<SwimmerPosition>
@@ -121,39 +138,18 @@ export default function SwimmingPool({
     [swimmerPositions, height, width]
   );
 
-  const appendLines = useCallback(
-    (graph: Graph) => {
-      const laneMarkers = times(swimmingPool.getLanesCount() - 1).map((index) =>
-        getLaneRightBoundXPosition(index + 1)
-      );
-      graph
-        .selectAll()
-        .data(laneMarkers)
-        .enter()
-        .append("line")
-        .attr("x1", (d) => d)
-        .attr("y1", 0)
-        .attr("x2", (d) => d)
-        .attr("y2", height)
-        .attr("stroke-width", 2)
-        .attr("stroke", "black");
-    },
-    [getLaneRightBoundXPosition, height, swimmingPool]
-  );
-
   const drawPool = useCallback(() => {
     const graph = d3
-      .select(ref.current)
+      .select(graphMountingElementRef.current)
       .append("svg:svg")
       .attr("width", width)
       .attr("height", height);
 
     appendCircles(graph as Graph);
-    appendLines(graph as Graph);
-  }, [appendCircles, appendLines, height, width]);
+  }, [appendCircles, height, width]);
 
   const clearAll = useCallback(() => {
-    d3.select(ref.current).selectAll("*").remove();
+    d3.select(graphMountingElementRef.current).selectAll("*").remove();
   }, []);
 
   useEffect(() => {
@@ -165,5 +161,17 @@ export default function SwimmingPool({
     drawPool();
   }, [clearAll, drawPool]);
 
-  return <Container width={width} height={height} ref={ref} />;
+  return (
+    <Container width={width} height={height}>
+      <GraphMountingElement ref={graphMountingElementRef} />
+      {times(swimmingPool.getLanesCount(), (index) => (
+        <Lane
+          key={index}
+          height={height}
+          width={laneWidth}
+          withBorder={index !== swimmingPool.getLanesCount() - 1}
+        />
+      ))}
+    </Container>
+  );
 }
