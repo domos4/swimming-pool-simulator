@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { ReactElement } from "react";
 import { times } from "lodash";
 import styled from "styled-components";
 import { Button } from "@blueprintjs/core";
@@ -22,28 +22,25 @@ interface Props {
   swimmingPool: SwimmingPool;
 }
 
-export default class SettingsPanel extends PureComponent<Props> {
-  addSwimmers = (howManySwimmers: number) => {
-    times(howManySwimmers, this.props.swimmingPool.addSwimmer);
-  };
-
-  renderButtons() {
-    return ADD_SWIMMERS_BUTTONS_OPTIONS.map((howManySwimmers, idx) => (
-      <StyledButton
-        key={idx}
-        icon={IconNames.ADD}
-        onClick={() => this.addSwimmers(howManySwimmers)}
-      >
-        add {howManySwimmers} swimmers
-      </StyledButton>
-    ));
+export default function SettingsPanel({
+  className,
+  swimmingPool,
+}: Props): ReactElement {
+  function addSwimmers(howManySwimmers: number) {
+    times(howManySwimmers, swimmingPool.addSwimmer);
   }
 
-  render() {
-    return (
-      <Container className={this.props.className}>
-        {this.renderButtons()}
-      </Container>
-    );
-  }
+  return (
+    <Container className={className}>
+      {ADD_SWIMMERS_BUTTONS_OPTIONS.map((howManySwimmers, idx) => (
+        <StyledButton
+          key={idx}
+          icon={IconNames.ADD}
+          onClick={() => addSwimmers(howManySwimmers)}
+        >
+          add {howManySwimmers} swimmers
+        </StyledButton>
+      ))}
+    </Container>
+  );
 }
