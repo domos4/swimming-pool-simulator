@@ -1,10 +1,11 @@
-import React, { ReactElement, useMemo } from "react";
+import React, { ReactElement, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import makeSwimmingPool from "./model/SwimmingPool";
 import SwimmingPool from "./components/swimming-pool/SwimmingPool";
 import SettingsPanel, {
   HEIGHT,
 } from "./components/settings-panel/SettingsPanel";
+import { times } from "lodash";
 
 const PADDING = 50;
 const Container = styled.div`
@@ -20,6 +21,10 @@ const StyledSettingsPanel = styled(SettingsPanel)`
 
 export default function AppContent(): ReactElement {
   const swimmingPool = useMemo(makeSwimmingPool, []);
+
+  useEffect(() => {
+    times(100, swimmingPool.addSwimmer);
+  }, [swimmingPool]);
 
   return (
     <Container>
