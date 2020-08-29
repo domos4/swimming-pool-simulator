@@ -27,7 +27,7 @@ export default function SettingsPanel({
   swimmingPool,
 }: Props): ReactElement {
   function addSwimmers(howManySwimmers: number) {
-    times(howManySwimmers, swimmingPool.addSwimmer);
+    times(howManySwimmers, swimmingPool.addRandomSwimmer);
   }
 
   return (

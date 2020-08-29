@@ -1,42 +1,48 @@
-import makeSwimmer, { SwimmerModel } from "./Swimmer";
-import { random } from "lodash";
+import { random, times } from "lodash";
+import makeLane, { LaneModel } from "./Lane";
+import { SwimmerModel } from "./Swimmer";
 
 interface Props {
-  length?: number; // in meters
-  lanesCount?: number;
-  refreshRate?: number; // in milliseconds
+  length: number; // in meters
+  lanesCount: number;
+  refreshRate: number; // in milliseconds
 }
+
+type LaneIndex = number; // starting from 1
+type LanesMap = Record<LaneIndex, LaneModel>;
 
 export interface SwimmingPoolModel {
   getLength: () => number;
   getLanesCount: () => number;
   getRefreshRate: () => number;
-  addSwimmer: () => void;
-  getSwimmers: () => Array<SwimmerModel>;
+  addRandomSwimmer: () => SwimmerModel;
+  getLanes: () => LanesMap;
 }
 
 export default function makeSwimmingPool({
-  length = 50,
-  lanesCount = 10,
-  refreshRate = 50,
-}: Props = {}): SwimmingPoolModel {
-  const swimmers: Array<SwimmerModel> = [];
+  length,
+  lanesCount,
+  refreshRate,
+}: Props): SwimmingPoolModel {
+  const lanes: LanesMap = times(lanesCount, (index) =>
+    makeLane({ index: index + 1, length, refreshRate })
+  ).reduce((accumulator, lane) => {
+    return {
+      ...accumulator,
+      [lane.getIndex()]: lane,
+    };
+  }, {});
 
-  function addSwimmer(): void {
+  function addRandomSwimmer(): SwimmerModel {
     const randomLaneIndex = random(1, lanesCount);
-    const swimmer = makeSwimmer({
-      laneLength: length,
-      laneIndex: randomLaneIndex,
-      refreshRate,
-    });
-    swimmers.push(swimmer);
+    return lanes[randomLaneIndex].addSwimmer();
   }
 
   return {
     getLength: () => length,
     getLanesCount: () => lanesCount,
     getRefreshRate: () => refreshRate,
-    addSwimmer,
-    getSwimmers: () => swimmers,
+    addRandomSwimmer,
+    getLanes: () => lanes,
   };
 }

@@ -15,7 +15,7 @@ function getOppositeDirection(direction: Direction): Direction {
 }
 
 interface Props {
-  laneIndex: number; // indexing from 1
+  laneIndex: number; // starting from 1
   laneLength: number; // in meters
   refreshRate: number; // in milliseconds
   speed?: number; // meters per millisecond

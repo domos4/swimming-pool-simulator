@@ -29,10 +29,18 @@ export default function AppContent(): ReactElement {
   const [width, setWidth] = useState(document.documentElement.clientWidth);
   const [height, setHeight] = useState(document.documentElement.clientHeight);
 
-  const swimmingPool = useMemo(makeSwimmingPool, []);
+  const swimmingPool = useMemo(
+    () =>
+      makeSwimmingPool({
+        length: 50,
+        lanesCount: 10,
+        refreshRate: 50,
+      }),
+    []
+  );
 
   useEffect(() => {
-    times(100, swimmingPool.addSwimmer);
+    times(100, swimmingPool.addRandomSwimmer);
   }, [swimmingPool]);
 
   const handleWindowResize = useCallback(

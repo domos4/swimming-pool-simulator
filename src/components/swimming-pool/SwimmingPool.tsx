@@ -103,12 +103,16 @@ export default function SwimmingPool({
     const scaleFactor = contentHeight / swimmingPool.getLength();
     refreshIntervalId.current = setInterval(() => {
       setSwimmerPositions(
-        swimmingPool.getSwimmers().map((swimmer) => ({
-          x: getSwimmerXPosition(swimmer),
-          y: swimmer.getPosition() * scaleFactor,
-        }))
+        Object.values(swimmingPool.getLanes())
+          .map((lane) =>
+            lane.getSwimmers().map((swimmer) => ({
+              x: getSwimmerXPosition(swimmer),
+              y: swimmer.getPosition() * scaleFactor,
+            }))
+          )
+          .flat()
       );
-    }, swimmingPool.getRefreshRate());
+    }, swimmingPool.getRefreshRate()); // refresh the interface with the same refresh rate as the model
   }, [contentHeight, getSwimmerXPosition, swimmingPool]);
 
   const appendCircles = useCallback(
