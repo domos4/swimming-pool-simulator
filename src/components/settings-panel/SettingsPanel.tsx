@@ -5,17 +5,17 @@ import { Button } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { SwimmingPoolModel } from "../../model/SwimmingPool";
 
-export const HEIGHT = 30;
+export const height = 30;
 const Container = styled.div`
   display: flex;
 `;
 const StyledButton = styled(Button)`
-  height: ${HEIGHT}px;
+  height: ${height}px;
   :not(:last-child) {
     margin-right: 16px;
   }
 `;
-const ADD_SWIMMERS_BUTTONS_OPTIONS = [1, 5, 10, 20, 50];
+const addSwimmersButtonValues = [1, 5, 10, 20, 50];
 
 interface Props {
   className?: string;
@@ -32,7 +32,7 @@ export default function SettingsPanel({
 
   return (
     <Container className={className}>
-      {ADD_SWIMMERS_BUTTONS_OPTIONS.map((howManySwimmers, idx) => (
+      {addSwimmersButtonValues.map((howManySwimmers, idx) => (
         <StyledButton
           key={idx}
           icon={IconNames.ADD}

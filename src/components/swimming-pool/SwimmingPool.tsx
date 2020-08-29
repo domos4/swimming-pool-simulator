@@ -12,7 +12,7 @@ import styled from "styled-components";
 import { SwimmingPoolModel } from "../../model/SwimmingPool";
 import { SwimmerModel } from "../../model/Swimmer";
 
-const BORDER_WIDTH = 2;
+const borderWidth = 2;
 const Container = styled.div<{
   width: number;
   height: number;
@@ -20,7 +20,7 @@ const Container = styled.div<{
 }>`
   width: ${(props) => props.width}px;
   height: ${(props) => props.height}px;
-  border: ${BORDER_WIDTH}px solid black;
+  border: ${borderWidth}px solid black;
 `;
 
 interface Props {
@@ -29,12 +29,17 @@ interface Props {
   swimmingPool: SwimmingPoolModel;
 }
 
-interface DataPoint {
+interface SwimmerPosition {
   x: number;
   y: number;
 }
 
-type Graph = d3.Selection<HTMLDivElement | null, DataPoint, null, undefined>;
+type Graph = d3.Selection<
+  HTMLDivElement | null,
+  SwimmerPosition,
+  null,
+  undefined
+>;
 
 export default function SwimmingPool({
   width,
@@ -43,9 +48,11 @@ export default function SwimmingPool({
 }: Props): ReactElement {
   const ref = useRef<HTMLDivElement>(null);
   const refreshIntervalId = useRef<number | undefined>(undefined);
-  const [data, setData] = useState<Array<DataPoint>>([]);
+  const [swimmerPositions, setSwimmerPositions] = useState<
+    Array<SwimmerPosition>
+  >([]);
 
-  const height = heightFromProps - 2 * BORDER_WIDTH;
+  const height = heightFromProps - 2 * borderWidth;
   const laneWidth = width / swimmingPool.getLanesCount();
 
   // lane starts indexing from 1
@@ -77,7 +84,7 @@ export default function SwimmingPool({
     }
     const scaleFactor = height / swimmingPool.getLength();
     refreshIntervalId.current = setInterval(() => {
-      setData(
+      setSwimmerPositions(
         swimmingPool.getSwimmers().map((swimmer) => ({
           x: getSwimmerXPosition(swimmer),
           y: swimmer.getPosition() * scaleFactor,
@@ -88,26 +95,36 @@ export default function SwimmingPool({
 
   const appendCircles = useCallback(
     (graph: Graph) => {
-      const x = d3.scaleLinear().domain([0, width]).range([0, width]);
-      const y = d3.scaleLinear().domain([0, height]).range([height, 0]);
+      const xScaleLinear = d3
+        .scaleLinear()
+        .domain([0, width])
+        .range([0, width]);
+      const yScaleLinear = d3
+        .scaleLinear()
+        .domain([0, height])
+        .range([height, 0]);
 
       graph
         .selectAll()
-        .data(data)
+        .data(swimmerPositions)
         .enter()
         .append("svg:circle")
-        .attr("cy", (d: DataPoint) => y(d.y))
-        .attr("cx", (d: DataPoint, idx: number) => x(data[idx].x))
+        .attr("cy", (swimmerPosition: SwimmerPosition) =>
+          yScaleLinear(swimmerPosition.y)
+        )
+        .attr("cx", (swimmerPosition: SwimmerPosition, index) =>
+          xScaleLinear(swimmerPositions[index].x)
+        )
         .attr("r", 10)
         .style("opacity", 0.6);
     },
-    [data, height, width]
+    [swimmerPositions, height, width]
   );
 
   const appendLines = useCallback(
     (graph: Graph) => {
-      const laneMarkers = times(swimmingPool.getLanesCount() - 1).map((idx) =>
-        getLaneRightBoundXPosition(idx + 1)
+      const laneMarkers = times(swimmingPool.getLanesCount() - 1).map((index) =>
+        getLaneRightBoundXPosition(index + 1)
       );
       graph
         .selectAll()
