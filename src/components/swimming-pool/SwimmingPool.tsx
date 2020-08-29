@@ -46,6 +46,7 @@ export default function SwimmingPool({
   swimmingPool,
 }: Props): ReactElement {
   const ref = useRef<HTMLDivElement>(null);
+  const refreshIntervalId = useRef<number | undefined>(undefined);
   const [data, setData] = useState<Array<DataPoint>>([]);
 
   const height = heightFromProps - 2 * BORDER_WIDTH;
@@ -79,8 +80,11 @@ export default function SwimmingPool({
   );
 
   const updateData = useCallback(() => {
+    if (refreshIntervalId.current !== undefined) {
+      clearInterval(refreshIntervalId.current);
+    }
     const scaleFactor = height / swimmingPool.getLength();
-    setInterval(() => {
+    refreshIntervalId.current = setInterval(() => {
       setData(
         swimmingPool.getSwimmers().map((swimmer) => ({
           x: getSwimmerXPosition(swimmer),
@@ -88,7 +92,7 @@ export default function SwimmingPool({
         }))
       );
     }, swimmingPool.getRefreshRate());
-  }, [getSwimmerXPosition, height, swimmingPool]);
+  }, [getSwimmerXPosition, height, refreshIntervalId, swimmingPool]);
 
   const appendCircles = useCallback(
     (graph: Graph) => {
