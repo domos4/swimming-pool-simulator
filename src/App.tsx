@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment, ReactElement } from "react";
 import AppContent from "./AppContent";
 import { createGlobalStyle } from "styled-components";
 import "@blueprintjs/core/lib/css/blueprint.css";
@@ -13,13 +13,11 @@ const GlobalStyle = createGlobalStyle`
     }
 `;
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <React.Fragment>
-        <GlobalStyle />
-        <AppContent />
-      </React.Fragment>
-    );
-  }
+export default function App(): ReactElement {
+  return (
+    <Fragment>
+      <GlobalStyle />
+      <AppContent />
+    </Fragment>
+  );
 }
