@@ -1,4 +1,5 @@
 import React, {
+  Fragment,
   ReactElement,
   useCallback,
   useEffect,
@@ -10,6 +11,7 @@ import * as d3 from "d3";
 import styled from "styled-components";
 import { SwimmingPoolModel } from "../../model/SwimmingPool";
 import { SwimmerModel } from "../../model/Swimmer";
+import Lane from "./Lane";
 
 interface BaseProps {
   width: number;
@@ -27,13 +29,8 @@ const Container = styled.div<BaseProps>`
   height: ${(props) => props.height}px;
 `;
 
-const Lane = styled.div<{
-  width: number;
-  withBorder: boolean;
-}>`
-  height: 100%;
-  width: ${(props) => props.width}px;
-  ${(props) => (props.withBorder ? `border-right: ${border};` : undefined)}
+const LaneDivider = styled.div`
+  border-right: ${border};
 `;
 
 const GraphMountingElement = styled.div`
@@ -170,11 +167,10 @@ export default function SwimmingPool({
     <Container width={width} height={height}>
       <GraphMountingElement ref={graphMountingElementRef} />
       {times(swimmingPool.getLanesCount(), (index) => (
-        <Lane
-          key={index}
-          width={laneWidth}
-          withBorder={index !== swimmingPool.getLanesCount() - 1}
-        />
+        <Fragment key={index}>
+          <Lane width={laneWidth - borderWidth} />
+          {index !== swimmingPool.getLanesCount() - 1 && <LaneDivider />}
+        </Fragment>
       ))}
     </Container>
   );
